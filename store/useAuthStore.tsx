@@ -1,6 +1,6 @@
+import parseJwtPayload from "@/utils/parseJwtPayload";
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-
 interface User {
   id?: string | null | undefined;
   name?: string | null | undefined;
@@ -10,36 +10,39 @@ interface User {
 
 interface AuthStore {
   user?: User | null;
-  access_token?: string | null;
+  accessToken?: string | null;
   expires?: string | null;
-  isAuthenticated: boolean;
   setUser: (user: User) => void;
   updateUser: (user: User, data: Partial<User>) => void;
-  setAccessToken: (access_token: string, exires: string) => void;
-  setIsAuthenticated: (isAuthenticated: boolean) => void;
+  setAccessToken: (accessToken: string) => void;
+  getIsAuthenticated: () => boolean;
   clear: () => void;
 }
 
 const useAuthStore = create<AuthStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
-      access_token: null,
+      accessToken: null,
       expires: null,
-      isAuthenticated: false,
       setUser: (user: User) => set({ user }),
-      updateUser: (user: User, data: Partial<User>) =>
-        set(() => ({ user: { ...user, ...data } })),
-      setAccessToken: (access_token: string, expires: string) =>
-        set({ access_token, expires }),
-      setIsAuthenticated: (isAuthenticated: boolean) =>
-        set({ isAuthenticated }),
+      updateUser: (data) =>
+        set((state) => ({ user: { ...state.user, ...data } })),
+      setAccessToken: (accessToken: string) =>
+        set({
+          accessToken,
+          expires: parseJwtPayload(accessToken)?.expiredAt,
+        }),
+      getIsAuthenticated: () => {
+        return get().expires
+          ? new Date() < new Date(get().expires as string)
+          : false;
+      },
       clear: () =>
         set({
           user: null,
-          access_token: null,
+          accessToken: null,
           expires: null,
-          isAuthenticated: false,
         }),
     }),
     {

@@ -7,10 +7,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { DialogDescription } from "@radix-ui/react-dialog";
-import { SignInResponse, signIn } from "next-auth/react";
+import { DialogClose, DialogDescription } from "@radix-ui/react-dialog";
 import GoogleLogo from "./google-logo";
-import GithubLogo from "./github-logo";
 import {
   Formik,
   Form,
@@ -21,6 +19,10 @@ import {
 } from "formik";
 import { useState } from "react";
 import Link from "next/link";
+import { useGoogleLogin } from "@react-oauth/google";
+import { clientAxios } from "@/utils/axios";
+import useAuthStore from "@/store/useAuthStore";
+import { useToast } from "@/components/ui/use-toast";
 
 interface LoginForm {
   email: string;
@@ -34,39 +36,50 @@ const loginFormInitialValue: LoginForm = {
 
 export function SigninDialog() {
   const [form, setForm] = useState<LoginForm>(loginFormInitialValue);
+  const { setAccessToken, setUser } = useAuthStore();
+  const { toast } = useToast();
 
   const signInWithEmailHandler = async (
     values: LoginForm,
     { setSubmitting }: FormikHelpers<LoginForm>,
   ) => {};
 
-  const popupCenter = (url: string, title: string) => {
-    const dualScreenLeft = window.screenLeft ?? window.screenX;
-    const dualScreenTop = window.screenTop ?? window.screenY;
-    const width =
-      window.innerWidth ?? document.documentElement.clientWidth ?? screen.width;
-
-    const height =
-      window.innerHeight ??
-      document.documentElement.clientHeight ??
-      screen.height;
-
-    const systemZoom = width / window.screen.availWidth;
-
-    const popupWidth = Math.min(500, width); // Adjust the maximum width as needed
-    const popupHeight = Math.min(600, height); // Adjust the maximum height as needed
-
-    const left = (width - popupWidth) / 2 / systemZoom + dualScreenLeft;
-    const top = (height - popupHeight) / 2 / systemZoom + dualScreenTop;
-
-    const newWindow = window.open(
-      url,
-      title,
-      `width=${popupWidth},height=${popupHeight},top=${top},left=${left}`,
-    );
-
-    newWindow?.focus();
-  };
+  const signInWithGoogleHandler = useGoogleLogin({
+    onSuccess: async ({ access_token }) => {
+      try {
+        const {
+          data: {
+            accessToken,
+            user: { id, avatar, email, name },
+          },
+        } = await clientAxios.post("/api/auth/google", {
+          token: access_token,
+        });
+        setUser({ name: name, id: id, email: email, image: avatar });
+        setAccessToken(accessToken);
+        toast({
+          title: "Hello",
+          description: "You already login",
+          variant: "default",
+        });
+        document.getElementById("close-login-popup")?.click();
+      } catch {
+        toast({
+          title: "Error",
+          description: "There is an error",
+          variant: "destructive",
+        });
+      }
+    },
+    onError: (errorResponse) => {
+      toast({
+        title: "Error",
+        description: errorResponse.error_description,
+        variant: "destructive",
+      });
+    },
+    flow: "implicit",
+  });
 
   return (
     <Dialog>
@@ -160,13 +173,14 @@ export function SigninDialog() {
             <Button
               className="inline-flex h-9 items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
               variant="outline"
-              onClick={() => popupCenter("/auth/google", "Signin with Google")}
+              onClick={() => signInWithGoogleHandler()}
             >
               <GoogleLogo className="mr-2 h-4 w-4" />
               Google
             </Button>
           </div>
         </div>
+        <DialogClose id="close-login-popup" />
         <DialogFooter>
           <p className="px-8 text-center text-sm text-muted-foreground">
             By clicking continue, you agree to our
@@ -183,7 +197,6 @@ export function SigninDialog() {
             >
               Privacy Policy
             </Link>
-            .
           </p>
         </DialogFooter>
       </DialogContent>

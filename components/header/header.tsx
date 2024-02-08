@@ -8,28 +8,6 @@ import { useEffect } from "react";
 import useAuthStore from "@/store/useAuthStore";
 
 export function Header() {
-  const pathName = usePathname();
-  const isAuthPopupPage = pathName.includes("/auth");
-  const { status, data: session } = useSession();
-  const { isAuthenticated, setUser, clear, setIsAuthenticated } =
-    useAuthStore();
-
-  useEffect(() => {
-    if (isAuthenticated && status != "authenticated") {
-      // TODO: user haven't signin yet
-    } else if (!isAuthenticated && session) {
-      if (session?.user) {
-        setUser(session.user);
-      }
-      // TODO: call API. Set another userData
-      try {
-        setIsAuthenticated(true);
-      } catch (error) {}
-    }
-  }, [isAuthenticated, session, setIsAuthenticated, setUser, status]);
-
-  if (isAuthPopupPage) return <></>;
-
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-14 max-w-screen-2xl items-center">

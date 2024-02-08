@@ -6,14 +6,14 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { signOut, useSession } from "next-auth/react";
 import { SigninDialog } from "@/components/signin/signin-dialog";
 import useAuthStore from "@/store/useAuthStore";
 import { useToast } from "@/components/ui/use-toast";
+import { googleLogout } from "@react-oauth/google";
 
 export default function UserAvatar() {
   const { toast } = useToast();
-  const { isAuthenticated, user, clear } = useAuthStore();
+  const { user, clear, getIsAuthenticated } = useAuthStore();
 
   const getUserFallbackHandler = (
     fullname: string | null | undefined,
@@ -27,7 +27,7 @@ export default function UserAvatar() {
 
   return (
     <>
-      {isAuthenticated ? (
+      {getIsAuthenticated() ? (
         <Popover>
           <PopoverTrigger asChild>
             <Button
@@ -73,7 +73,7 @@ export default function UserAvatar() {
                 variant="default"
                 size="sm"
                 onClick={() => {
-                  signOut();
+                  googleLogout();
                   clear();
                   toast({
                     title: "Byebye!",
