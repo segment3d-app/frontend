@@ -6,10 +6,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { SigninDialog } from "@/components/signin/signin-dialog";
 import useAuthStore from "@/store/useAuthStore";
 import { useToast } from "@/components/ui/use-toast";
 import { googleLogout } from "@react-oauth/google";
+import Auth from "@/components/auth/auth";
 
 export default function UserAvatar() {
   const { toast } = useToast();
@@ -88,9 +88,7 @@ export default function UserAvatar() {
           </PopoverContent>
         </Popover>
       ) : (
-        <>
-          <SigninDialog />
-        </>
+        <Auth />
       )}
     </>
   );
