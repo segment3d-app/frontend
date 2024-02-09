@@ -38,6 +38,7 @@ export default function UserAvatar() {
                 <AvatarImage
                   className="rounded-full"
                   src={user?.image ?? ""}
+                  crossOrigin="anonymous"
                   alt="@shadcn"
                 />
                 <AvatarFallback>
@@ -46,9 +47,12 @@ export default function UserAvatar() {
               </Avatar>
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="mr-5">
-            <div className="text-14 grid grid-flow-col grid-rows-2 gap-4">
-              <div className="justify-content row-span-2 flex aspect-square max-w-10 items-center">
+          <PopoverContent className="mr-5 text-sm">
+            <div className="justify-content flex w-full flex-row items-center gap-4">
+              <Button
+                style={{ width: "36px" }}
+                className="flex aspect-square !h-full !w-[36px] items-center justify-center rounded-full p-0"
+              >
                 <Avatar>
                   <AvatarImage
                     className="rounded-full"
@@ -60,15 +64,15 @@ export default function UserAvatar() {
                     {getUserFallbackHandler(user?.name)}
                   </AvatarFallback>
                 </Avatar>
-              </div>
-              <div className="text-10 col-span-2">
-                <p>{user?.name}</p>
-              </div>
-              <div className="col-span-2 row-span-1">
-                <p>{user?.email}</p>
+              </Button>
+              <div className="truncate">
+                <div className="text-10 col-span-2 truncate">{user?.name}</div>
+                <div className="truncte col-span-2 row-span-1 truncate">
+                  {user?.email}
+                </div>
               </div>
             </div>
-            <div className="mt-10 grid">
+            <div className="mt-4 grid">
               <Button
                 variant="default"
                 size="sm"
