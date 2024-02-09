@@ -1,53 +1,21 @@
 "use client";
 
-import { usePathname } from "next/navigation";
 import ModeToggle from "./components/mode-toggle";
 import UserAvatar from "./components/user-avatar";
-import { useSession } from "next-auth/react";
-import { useEffect } from "react";
-import useAuthStore from "@/store/useAuthStore";
+import Navigation from "./components/navigation";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 max-w-screen-2xl items-center">
+    <header className="text-md sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-[64px] max-w-screen-2xl items-center">
         <div className="mr-4 hidden md:flex">
           <a className="mr-6 flex items-center space-x-2" href="/">
-            <span className="hidden font-bold sm:inline-block">
+            <span className="hidden text-lg font-bold sm:inline-block">
               segment3d.app
             </span>
           </a>
-          <nav className="flex items-center gap-6 text-sm">
-            <a
-              className="text-foreground/60 transition-colors hover:text-foreground/80"
-              href="/docs"
-            >
-              Docs
-            </a>
-            <a
-              className="text-foreground transition-colors hover:text-foreground/80"
-              href="/docs/components"
-            >
-              Components
-            </a>
-            <a
-              className="text-foreground/60 transition-colors hover:text-foreground/80"
-              href="/themes"
-            >
-              Themes
-            </a>
-            <a
-              className="text-foreground/60 transition-colors hover:text-foreground/80"
-              href="/examples"
-            >
-              Examples
-            </a>
-            <a
-              className="hidden text-foreground/60 transition-colors hover:text-foreground/80 lg:block"
-              href="https://github.com/shadcn-ui/ui"
-            >
-              GitHub
-            </a>
+          <nav className="flex items-center gap-6">
+            <Navigation />
           </nav>
         </div>
         <button

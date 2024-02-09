@@ -23,11 +23,13 @@ interface SignupDialogProps {
 
 interface SignupForm {
   email: string;
+  name: string;
   password: string;
 }
 
 const SignupSchema = Yup.object().shape({
   email: Yup.string().email("email is not valid").required("email is required"),
+  name: Yup.string().required("name is required"),
   password: Yup.string()
     .min(8, "password should have at least 8 character length")
     .matches(/[a-z]/, "password must include lowercase characters")
@@ -125,6 +127,7 @@ export function SignupDialog({ setAuthType }: SignupDialogProps) {
           <Formik
             initialValues={{
               email: "",
+              name: "",
               password: "",
             }}
             onSubmit={signupWithCredentialHandler}
@@ -149,6 +152,24 @@ export function SignupDialog({ setAuthType }: SignupDialogProps) {
                     />
                     <div className="px-4 text-xs text-red-500">
                       <ErrorMessage name="email" />
+                    </div>
+                  </div>
+                  <div className="grid gap-1">
+                    <label
+                      className="sr-only text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      htmlFor="name"
+                    >
+                      Name
+                    </label>
+                    <Field
+                      name="name"
+                      id="name"
+                      className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                      placeholder="name"
+                      type="text"
+                    />
+                    <div className="px-4 text-xs text-red-500">
+                      <ErrorMessage name="name" />
                     </div>
                   </div>
                   <div className="grid gap-1">

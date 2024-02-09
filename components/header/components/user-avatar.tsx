@@ -10,6 +10,7 @@ import useAuthStore from "@/store/useAuthStore";
 import { useToast } from "@/components/ui/use-toast";
 import { googleLogout } from "@react-oauth/google";
 import Auth from "@/components/auth/auth";
+import AvatarIcon from "./avatar-icon";
 
 export default function UserAvatar() {
   const { toast } = useToast();
@@ -31,20 +32,11 @@ export default function UserAvatar() {
         <Popover>
           <PopoverTrigger asChild>
             <Button
-              variant="outline"
-              className="aspect-square rounded-full p-0"
+              variant="ghost"
+              size="icon"
+              className="aspect-square h-[1.6rem] w-[1.6rem] rounded-full p-0"
             >
-              <Avatar>
-                <AvatarImage
-                  className="rounded-full"
-                  src={user?.image ?? ""}
-                  crossOrigin="anonymous"
-                  alt="@shadcn"
-                />
-                <AvatarFallback>
-                  {getUserFallbackHandler(user?.name)}
-                </AvatarFallback>
-              </Avatar>
+              <AvatarIcon />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="mr-5 text-sm">

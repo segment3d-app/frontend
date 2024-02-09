@@ -113,15 +113,11 @@ export function SigninDialog({ setAuthType }: SigninDialogProps) {
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
         <div className="mt-5 flex flex-col space-y-2 text-center">
-          <DialogTitle>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Welcome Back!
-            </h1>
+          <DialogTitle className="text-2xl font-semibold tracking-tight">
+            Welcome Back!
           </DialogTitle>
-          <DialogDescription>
-            <p className="text-sm text-muted-foreground">
-              Enter your email below to login into your account
-            </p>
+          <DialogDescription className="text-sm text-muted-foreground">
+            Enter your email below to login into your account
           </DialogDescription>
         </div>
       </DialogHeader>
