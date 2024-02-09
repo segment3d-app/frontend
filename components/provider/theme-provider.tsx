@@ -7,17 +7,17 @@ import { type ThemeProviderProps } from "next-themes/dist/types";
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
-  return (
-    mounted && (
-      <NextThemesProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-        disableTransitionOnChange
-        {...props}
-      >
-        {children}
-      </NextThemesProvider>
-    )
+  return mounted ? (
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+      {...props}
+    >
+      {children}
+    </NextThemesProvider>
+  ) : (
+    <></>
   );
 }
