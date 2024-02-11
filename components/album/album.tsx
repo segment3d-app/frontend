@@ -1,7 +1,7 @@
-import CaptureCard from "../common/capture-card/capture-card";
+import AlbumCard from "../common/album-card/album-card";
 import FloatingFilter from "../common/floating-filter/floating-filter";
 
-export default function Capture() {
+export default function Album() {
   return (
     <div className="my-8 w-full">
       <FloatingFilter>
@@ -12,10 +12,10 @@ export default function Capture() {
           <div>Create your first NeRF capture today.</div>
         </div>
       </FloatingFilter>
-      <div className="grid grid-cols-3 gap-4 px-8 pt-4">
+      <div className="grid grid-cols-2 gap-4 px-8 pt-4">
         {Array.from({ length: 5 }).map((_, id) => (
           <div key={id}>
-            <CaptureCard />
+            <AlbumCard />
           </div>
         ))}
       </div>

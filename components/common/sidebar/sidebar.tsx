@@ -75,11 +75,11 @@ export default function Sidebar() {
     },
     {
       id: 3,
-      name: "Gallery",
-      path: "/gallery",
+      name: "Album",
+      path: "/album",
       icon: <MixIcon className="h-[20px] w-[20px]" />,
       onClick: () => {
-        route.push("/gallery");
+        route.push("/album");
       },
     },
     {
