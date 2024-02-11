@@ -1,8 +1,9 @@
+import AssetCard from "../common/asset-card/asset-card";
 import FloatingFilter from "../common/floating-filter/floating-filter";
 
 export default function Explore() {
   return (
-    <div className="my-8 h-[2000px] w-full">
+    <div className="my-8 w-full">
       <FloatingFilter>
         <div className="mb-4 flex flex-col gap-4 text-center">
           <div className="px-8 text-2xl font-bold">
@@ -11,7 +12,13 @@ export default function Explore() {
           <div>Create your first NeRF capture today.</div>
         </div>
       </FloatingFilter>
-      <div className="grid-col-3 grid"></div>
+      <div className="grid grid-cols-3 gap-4 px-8 pt-4">
+        {Array.from({ length: 5 }).map((_, id) => (
+          <div key={id}>
+            <AssetCard />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
