@@ -1,3 +1,5 @@
-export default function Capture() {
-  return <div className="h-screen"></div>;
+import Capture from "@/components/capture/capture";
+
+export default function CapturePage() {
+  return <Capture />;
 }

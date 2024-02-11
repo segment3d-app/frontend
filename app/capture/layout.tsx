@@ -12,11 +12,9 @@ export default function CaptureLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex">
-      <div className="w-[250px]">
-        <Sidebar />
-      </div>
-      {children}
+    <div className="flex w-full justify-end ">
+      <Sidebar />
+      <div className="overflow auto w-[calc(100%-250px)]">{children}</div>
     </div>
   );
 }
