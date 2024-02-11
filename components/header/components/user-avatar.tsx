@@ -10,7 +10,7 @@ import useAuthStore from "@/store/useAuthStore";
 import { useToast } from "@/components/ui/use-toast";
 import { googleLogout } from "@react-oauth/google";
 import Auth from "@/components/auth/auth";
-import AvatarIcon from "./avatar-icon";
+import { PersonIcon } from "@radix-ui/react-icons";
 
 export default function UserAvatar() {
   const { toast } = useToast();
@@ -36,7 +36,7 @@ export default function UserAvatar() {
               size="icon"
               className="aspect-square h-[1.6rem] w-[1.6rem] rounded-full p-0"
             >
-              <AvatarIcon />
+              <PersonIcon className="h-5 w-5" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="mr-5 text-sm">
