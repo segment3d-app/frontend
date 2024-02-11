@@ -19,6 +19,7 @@ export default function Create() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem
+            className="cursor-pointer"
             onClick={() =>
               document
                 .getElementById("create-gaussian-splatting-trigger")

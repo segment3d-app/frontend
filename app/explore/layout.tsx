@@ -1,4 +1,4 @@
-import Sidebar from "@/components/sidebar/sidebar";
+import Sidebar from "@/components/common/sidebar/sidebar";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -12,11 +12,9 @@ export default function ExploreLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex">
-      <div className="w-[250px]">
-        <Sidebar />
-      </div>
-      {children}
+    <div className="flex w-full justify-end ">
+      <Sidebar />
+      <div className="overflow auto w-[calc(100%-250px)]">{children}</div>
     </div>
   );
 }

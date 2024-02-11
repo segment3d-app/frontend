@@ -8,7 +8,7 @@ import {
   MixIcon,
   RocketIcon,
 } from "@radix-ui/react-icons";
-import { Toggle } from "../ui/toggle";
+import { Toggle } from "../../ui/toggle";
 import {
   Dialog,
   DialogClose,
@@ -17,10 +17,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import UploadIcon from "./components/upload-icon";
 import { ChangeEvent, useState } from "react";
-import { useToast } from "../ui/use-toast";
+import { useToast } from "../../ui/use-toast";
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
 import {
   Select,
@@ -28,7 +28,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "../../ui/select";
 
 import * as Yup from "yup";
 
@@ -149,7 +149,7 @@ export default function Sidebar() {
 
   return (
     <div
-      className={`absolute left-0 top-0 box-border block h-full w-full overflow-x-hidden overflow-y-scroll border-r border-border/40 bg-background/95 bg-white px-0 px-[32px] pb-0 pt-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 lg:fixed lg:-right-[50vw] lg:bottom-0 lg:right-0 lg:top-auto lg:z-[49] lg:h-[calc(100%-64px)] lg:w-[250px] lg:px-8`}
+      className={`fixed left-0 top-16 box-border block h-full  h-screen w-full min-w-[250px] max-w-[250px] overflow-y-auto overflow-x-hidden overflow-y-scroll border-r border-border/40 bg-background/95 bg-white px-0 px-[32px] pb-0 pt-4 backdrop-blur supports-[backdrop-filter]:bg-background/60`}
       style={{
         transition: "right 500ms, top 500ms ease-in-out",
         msOverflowStyle: "none",
