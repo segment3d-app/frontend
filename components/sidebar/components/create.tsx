@@ -18,7 +18,15 @@ export default function Create() {
         <DropdownMenuLabel>Choose Mode</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>Gaussian Splatting</DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() =>
+              document
+                .getElementById("create-gaussian-splatting-trigger")
+                ?.click()
+            }
+          >
+            3D Gaussian Asset
+          </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
