@@ -31,6 +31,7 @@ import {
 } from "../../ui/select";
 
 import * as Yup from "yup";
+import UploadFileHandler from "@/utils/uploadFileHandler";
 
 const UploadVideoSchema = Yup.object().shape({
   name: Yup.string().required("name is required"),
@@ -142,7 +143,31 @@ export default function Sidebar() {
   ) => {
     setSubmitting(true);
 
-    console.log(values);
+    try {
+      const { error, url, message } = await UploadFileHandler(
+        "test",
+        uploadedFile?.file,
+      );
+      if (!error) {
+        toast({
+          title: "Success",
+          description: message,
+          variant: "default",
+        });
+        console.log(url);
+      } else {
+        toast({
+          title: "Error",
+          description: error,
+          variant: "destructive",
+        });
+      }
+    } catch {
+      toast({
+        title: "Error",
+        variant: "destructive",
+      });
+    }
 
     setSubmitting(false);
   };

@@ -8,4 +8,8 @@ const clientAxios = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_CLIENT,
 });
 
-export { serverAxios, clientAxios };
+const storageAxios = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_STORAGE,
+});
+
+export { serverAxios, clientAxios, storageAxios };

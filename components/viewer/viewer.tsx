@@ -20,7 +20,7 @@ const Viewer: React.FC = () => {
   useEffect(() => {
     if (view) {
       view
-        .addSplatScene("/sample/converted_file.ksplat", {
+        .addSplatScene("/sample/point_cloud.ply", {
           showLoadingSpinner: true,
         })
         .then(() => {
