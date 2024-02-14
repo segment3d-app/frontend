@@ -18,20 +18,7 @@ const nextConfig = {
     ];
   },
   images: {
-    remotePatterns: [
-      {
-        protocol: "http",
-        hostname: "localhost",
-        port: "8081",
-        pathname: "/",
-      },
-      {
-        protocol: "http",
-        hostname: "storage",
-        port: "8081",
-        pathname: "/",
-      },
-    ],
+    domains: ["localhost", "storage", "0.0.0.0"],
   },
 };
 

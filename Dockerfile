@@ -24,4 +24,4 @@ COPY --from=builder /app/.next/ ./.next/
 COPY --from=builder /app/node_modules ./node_modules
 COPY . .
 
-CMD if [ $NODE_ENV = "production" ]; then pnpm start; else pnpm dev; fi
+CMD if [ $ENV = "production" ]; then pnpm start; else pnpm dev; fi

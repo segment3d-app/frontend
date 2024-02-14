@@ -16,7 +16,11 @@ export default async function UploadFileHandler(
       data: { url, message },
     } = await clientAxios.post("/api/media", form);
     return { error: null, url: url, message: message };
-  } catch (error) {
-    return { error: "", url: null, message: null };
+  } catch (err: any) {
+    return {
+      error: err?.response?.data?.error ?? "upload file error",
+      url: null,
+      message: null,
+    };
   }
 }
