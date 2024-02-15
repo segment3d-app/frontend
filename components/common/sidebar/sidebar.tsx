@@ -29,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../ui/select";
+import Image from "next/image";
 
 import * as Yup from "yup";
 import UploadFileHandler from "@/utils/uploadFileHandler";
@@ -49,11 +50,22 @@ export default function Sidebar() {
   const pathName = usePathname();
   const route = useRouter();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<{
-    file?: File | null;
-    dataUrl?: string | null;
-    url?: string | null;
-  } | null>();
+    type: "images" | "video";
+    vidData?: {
+      file?: File | null;
+      dataUrl?: string | null;
+      url?: string | null;
+    } | null;
+    imgData?:
+      | {
+          file?: File | null;
+          dataUrl?: string | null;
+          url?: string | null;
+        }[]
+      | null;
+  } | null>(null);
 
   const SIDEBAR_DATA = [
     {
@@ -92,10 +104,11 @@ export default function Sidebar() {
   ];
 
   const openDirectory = () => {
+    if (isLoading) return;
     const fileInput = document.createElement("input");
     fileInput.type = "file";
-    fileInput.accept = "video/*";
-    fileInput.multiple = false;
+    fileInput.accept = "image/*,video/*";
+    fileInput.multiple = true;
     fileInput.addEventListener(
       "change",
       handleFileUpload as unknown as EventListener,
@@ -104,37 +117,125 @@ export default function Sidebar() {
   };
 
   const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files?.length && event.target.files.length > 1) {
+    setIsLoading(true);
+    const files = event.target.files;
+    const length = files?.length;
+
+    if (files && length) {
+      if (files[0].type.includes("image")) {
+        handleFileImagesUpload(files);
+      } else if (files[0].type.includes("video")) {
+        handleFileVideoUpload(files);
+      } else {
+        toast({
+          title: "Error",
+          description: "format file is not supported",
+          variant: "destructive",
+        });
+      }
+      if (event.target) {
+        (event.target as HTMLInputElement).value = "";
+      }
+    } else {
       toast({
         title: "Error",
-        description: "cannot upload more than 1 files",
+        description: "failed to upload file",
+        variant: "destructive",
+      });
+    }
+    setIsLoading(false);
+  };
+
+  const handleFileVideoUpload = async (files: FileList) => {
+    if (files.length > 1 || !files.length) {
+      toast({
+        title: "Error",
+        description: "You need to upload 1 video",
         variant: "destructive",
       });
       return;
     }
 
-    const file = event.target.files && event.target.files[0];
-    if (file) {
-      if (!file.type.includes("video")) {
+    const readVideoFileAsDataURL = (file: File) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          resolve(reader.result);
+        };
+        reader.onerror = () => {
+          reject(new Error("Failed to read video file"));
+        };
+        reader.readAsDataURL(file);
+      });
+    };
+
+    try {
+      const file = files[0];
+      const fileUploadedURL = await readVideoFileAsDataURL(file);
+      if (typeof fileUploadedURL === "string") {
+        setUploadedFile({
+          type: "video",
+          vidData: {
+            file: file,
+            dataUrl: fileUploadedURL,
+          },
+        });
+      }
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to upload video",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleFileImagesUpload = (files: FileList) => {
+    if (files.length < 20) {
+      toast({
+        title: "Error",
+        description: "You need to upload at least 20 images",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const promises = Array.from(files).map((file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (typeof reader.result === "string") {
+            resolve({
+              file: file,
+              dataUrl: reader.result,
+            });
+          } else {
+            reject(new Error("Failed to load image"));
+          }
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    });
+
+    Promise.all(promises)
+      .then((result) => {
+        setUploadedFile({
+          type: "images",
+          imgData: result as {
+            file?: File | null | undefined;
+            dataUrl?: string | null | undefined;
+            url?: string | null | undefined;
+          }[],
+        });
+      })
+      .catch(() => {
         toast({
           title: "Error",
-          description: "please upload video",
+          description: "Error loading one or more images",
           variant: "destructive",
         });
-        return;
-      }
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (typeof reader.result === "string") {
-          const fileUploadedURL = reader.result;
-          setUploadedFile({ file: file, dataUrl: fileUploadedURL }); // Move this line here to ensure fileUploadedURL is set before updating the state
-        }
-      };
-      reader.readAsDataURL(file);
-      if (event.target) {
-        (event.target as HTMLInputElement).value = "";
-      }
-    }
+      });
   };
 
   const create3DAssetHandler = async (
@@ -144,9 +245,13 @@ export default function Sidebar() {
     setSubmitting(true);
 
     try {
+      let folderName = `assets/${values.name}/source`;
       const { error, url, message } = await UploadFileHandler(
-        "test",
-        uploadedFile?.file,
+        folderName,
+        uploadedFile?.type === "video"
+          ? uploadedFile?.vidData?.file
+          : uploadedFile?.imgData?.map((data) => data.file as File),
+        uploadedFile?.type === "images" ? true : false,
       );
       if (!error) {
         toast({
@@ -154,7 +259,9 @@ export default function Sidebar() {
           description: message,
           variant: "default",
         });
-        console.log(url);
+        setUploadedFile(null);
+        document.getElementById("create-gaussian-splatting-trigger")?.click();
+        route.push("/capture");
       } else {
         toast({
           title: "Error",
@@ -207,10 +314,24 @@ export default function Sidebar() {
                   className="flex h-[236px] w-[410px] flex-col items-center justify-center gap-4 rounded-lg bg-[#FFFFFF0A] px-8 text-center text-sm hover:bg-[#FFFFFF0F]"
                   onClick={openDirectory}
                 >
-                  <div>
-                    <UploadIcon />
-                  </div>
-                  <p>Upload or drop video with a duration of 2-3 minutes </p>
+                  {isLoading ? (
+                    <>
+                      <div
+                        className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                        role="status"
+                      />
+                      <span>Loading...</span>
+                    </>
+                  ) : (
+                    <>
+                      <div>
+                        <UploadIcon />
+                      </div>
+                      <p>
+                        Upload or drop video with a duration of 2-3 minutes{" "}
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
               <DialogFooter>
@@ -234,27 +355,67 @@ export default function Sidebar() {
                     <DialogTitle>Fill Asset Attribute</DialogTitle>
                     <div className="my-4 grid min-h-[300px] w-full grid-cols-5 gap-6">
                       <div className="col-span-2 flex h-full items-center rounded-lg border-[0.2px]">
-                        <div className="relative h-full w-full">
-                          <video
-                            src={
-                              uploadedFile.dataUrl ??
-                              (uploadedFile.url as string)
-                            }
-                            autoPlay
-                            playsInline
-                            disablePictureInPicture
-                            controls
-                            loop
-                            className="h-full w-full object-contain"
-                            style={{ objectFit: "contain" }}
-                          ></video>
-                          <canvas className="hidden"></canvas>
-                          <div className="css-1bo7h9d backface-visibility-hidden absolute bottom-0 left-0 bg-black bg-opacity-50 p-2 text-white">
-                            <p className="chakra-text">
-                              {uploadedFile.file?.name}
-                            </p>
+                        {uploadedFile.type === "video" ? (
+                          <div className="relative h-full w-full">
+                            <video
+                              src={
+                                uploadedFile?.vidData?.dataUrl ??
+                                (uploadedFile?.vidData?.url as string)
+                              }
+                              autoPlay
+                              playsInline
+                              disablePictureInPicture
+                              controls
+                              loop
+                              className="h-full w-full object-contain"
+                              style={{ objectFit: "contain" }}
+                            ></video>
+                            <canvas className="hidden"></canvas>
+                            <div className="css-1bo7h9d backface-visibility-hidden absolute bottom-0 left-0 bg-black bg-opacity-50 p-2 text-white">
+                              <p className="chakra-text">
+                                {uploadedFile?.vidData?.file?.name}
+                              </p>
+                            </div>
                           </div>
-                        </div>
+                        ) : (
+                          <div className="grid grid-cols-2">
+                            {uploadedFile.imgData
+                              ?.slice(0, 4)
+                              .map((img, id) => (
+                                <div key={img.file?.name + id.toString()}>
+                                  {id == 3 &&
+                                  (uploadedFile?.imgData?.length ?? 0) > 4 ? (
+                                    <div className="relative">
+                                      <Image
+                                        src={img.dataUrl ?? (img.url as string)}
+                                        width={500}
+                                        height={500}
+                                        alt={img.file?.name ?? ""}
+                                      />
+                                      <div
+                                        style={{
+                                          background:
+                                            "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))",
+                                        }}
+                                        className="absolute left-1/2 top-1/2 flex h-full w-full -translate-x-1/2 -translate-y-1/2 items-center justify-center"
+                                      >
+                                        +
+                                        {(uploadedFile?.imgData?.length ?? 0) -
+                                          4}
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <Image
+                                      src={img.dataUrl ?? (img.url as string)}
+                                      width={500}
+                                      height={500}
+                                      alt={img.file?.name ?? ""}
+                                    />
+                                  )}
+                                </div>
+                              ))}
+                          </div>
+                        )}
                       </div>
                       <div className="col-span-3">
                         <div className="grid grid-cols-2 gap-6">
@@ -270,7 +431,9 @@ export default function Sidebar() {
                               id="name"
                               className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                               placeholder={
-                                uploadedFile.file?.name.split(".")[0]
+                                uploadedFile?.vidData?.file?.name.split(
+                                  ".",
+                                )[0] || "asset name"
                               }
                               type="text"
                             />

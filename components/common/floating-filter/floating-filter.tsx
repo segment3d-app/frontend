@@ -17,7 +17,6 @@ export default function FloatingFilter({ children }: FloatingFilterProps) {
   const handleScroll = () => {
     if (filterRef.current) {
       const { top } = filterRef.current.getBoundingClientRect();
-      console.log(top, isSticky, top <= 64);
       setIsSticky(top <= 64);
     }
   };
