@@ -12,19 +12,19 @@ import { googleLogout } from "@react-oauth/google";
 import Auth from "@/components/auth/auth";
 import { PersonIcon } from "@radix-ui/react-icons";
 
+export const getUserFallbackHandler = (
+  fullname: string | null | undefined,
+): string => {
+  if (!fullname) return "";
+
+  let splittedName = fullname.split(" ");
+  splittedName = splittedName.slice(0, 2).map((name) => name[0]);
+  return splittedName.join(" ");
+};
+
 export default function UserAvatar() {
   const { toast } = useToast();
   const { user, clear, getIsAuthenticated } = useAuthStore();
-
-  const getUserFallbackHandler = (
-    fullname: string | null | undefined,
-  ): string => {
-    if (!fullname) return "";
-
-    let splittedName = fullname.split(" ");
-    splittedName = splittedName.slice(0, 2).map((name) => name[0]);
-    return splittedName.join(" ");
-  };
 
   return (
     <>

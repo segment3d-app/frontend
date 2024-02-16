@@ -293,7 +293,7 @@ export default function Sidebar() {
           assetUrl = tempArr?.splice(0, tempArr.length - 1)?.join("/");
         }
         const { data } = await clientAxios.post(
-          "/api/asset",
+          "/api/assets",
           {
             assetType: uploadedFile?.type,
             assetUrl: assetUrl,
