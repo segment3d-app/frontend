@@ -20,6 +20,8 @@ const nextConfig = {
   images: {
     domains: ["localhost", "storage", "0.0.0.0"],
   },
+  output: "standalone",
+  reactStrictMode: false,
 };
 
 module.exports = nextConfig;
