@@ -61,7 +61,6 @@ export default function AssetCard({ asset }: AssetCardProps) {
             style={{
               transition: "all 0.8s ease-in-out 0s",
             }}
-            unoptimized={true}
             className="aspect-square h-full w-full rounded-b-lg object-cover transition-transform duration-200 ease-in-out group-hover:scale-[1.1]"
           />
         )}
