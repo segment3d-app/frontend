@@ -33,6 +33,8 @@ import Image from "next/image";
 
 import * as Yup from "yup";
 import UploadFileHandler from "@/utils/uploadFileHandler";
+import { clientAxios } from "@/utils/axios";
+import useAuthStore from "@/store/useAuthStore";
 
 const UploadVideoSchema = Yup.object().shape({
   name: Yup.string().required("name is required"),
@@ -51,6 +53,7 @@ export default function Sidebar() {
   const route = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const { accessToken } = useAuthStore();
   const [uploadedFile, setUploadedFile] = useState<{
     type: "images" | "video";
     vidData?: {
@@ -246,7 +249,15 @@ export default function Sidebar() {
 
     try {
       let folderName = `assets/${values.name}/source`;
-      const { error, url, message } = await UploadFileHandler(
+      const {
+        error,
+        url,
+        message,
+      }: {
+        error?: any | null;
+        url?: string[] | null;
+        message?: string | null;
+      } = await UploadFileHandler(
         folderName,
         uploadedFile?.type === "video"
           ? uploadedFile?.vidData?.file
@@ -259,6 +270,27 @@ export default function Sidebar() {
           description: message,
           variant: "default",
         });
+        let assetUrl = (url?.length ?? 0) >= 1 ? url?.[0] : "";
+        if (uploadedFile?.type === "images") {
+          let tempArr = assetUrl?.split("/");
+          assetUrl = tempArr?.splice(0, tempArr.length - 1)?.join("/");
+        }
+        const { data } = await clientAxios.post(
+          "/api/asset",
+          {
+            assetType: uploadedFile?.type,
+            assetUrl: assetUrl,
+            isPrivate: values.privacy === "private" ? true : false,
+            title: values.name,
+          },
+          { headers: { Authorization: `Bearer ${accessToken}` } },
+        );
+        toast({
+          title: "Success",
+          description: data?.message,
+          variant: "default",
+        });
+
         setUploadedFile(null);
         document.getElementById("create-gaussian-splatting-trigger")?.click();
         route.push("/capture");
