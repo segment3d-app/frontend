@@ -14,7 +14,7 @@ export default function Auth() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="default" size="sm">
+        <Button variant="default" size="sm" id="dialog-auth-btn">
           {authType === AuthType.SIGNIN ? "Signin" : "Signup"}
         </Button>
       </DialogTrigger>

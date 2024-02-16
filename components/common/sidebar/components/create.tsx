@@ -7,8 +7,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/components/ui/use-toast";
+import useAuthStore from "@/store/useAuthStore";
 
 export default function Create() {
+  const { getIsAuthenticated } = useAuthStore();
+  const { toast } = useToast();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -20,11 +24,20 @@ export default function Create() {
         <DropdownMenuGroup>
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() =>
+            onClick={() => {
+              if (!getIsAuthenticated()) {
+                document.getElementById("dialog-auth-btn")?.click();
+                toast({
+                  title: "Error",
+                  description: "you need to login first",
+                  variant: "destructive",
+                });
+                return;
+              }
               document
                 .getElementById("create-gaussian-splatting-trigger")
-                ?.click()
-            }
+                ?.click();
+            }}
           >
             3D Gaussian Asset
           </DropdownMenuItem>

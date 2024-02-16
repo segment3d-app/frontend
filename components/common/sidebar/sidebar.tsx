@@ -53,7 +53,7 @@ export default function Sidebar() {
   const route = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const { accessToken } = useAuthStore();
+  const { accessToken, getIsAuthenticated } = useAuthStore();
   const [uploadedFile, setUploadedFile] = useState<{
     type: "images" | "video";
     vidData?: {
@@ -86,6 +86,10 @@ export default function Sidebar() {
       path: "/capture",
       icon: <CameraIcon className="h-[20px] w-[20px]" />,
       onClick: () => {
+        if (!getIsAuthenticated()) {
+          isNotLoginHandler();
+          return;
+        }
         route.push("/capture");
       },
     },
@@ -95,6 +99,10 @@ export default function Sidebar() {
       path: "/album",
       icon: <MixIcon className="h-[20px] w-[20px]" />,
       onClick: () => {
+        if (!getIsAuthenticated()) {
+          isNotLoginHandler();
+          return;
+        }
         route.push("/album");
       },
     },
@@ -105,6 +113,15 @@ export default function Sidebar() {
       onClick: () => {},
     },
   ];
+
+  const isNotLoginHandler = () => {
+    document.getElementById("dialog-auth-btn")?.click();
+    toast({
+      title: "Error",
+      description: "you need to login first",
+      variant: "destructive",
+    });
+  };
 
   const openDirectory = () => {
     if (isLoading) return;
