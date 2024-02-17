@@ -21,7 +21,8 @@ const nextConfig = {
     domains: ["localhost", "storage", "0.0.0.0"],
   },
   output: "standalone",
-  reactStrictMode: false,
+  reactStrictMode: true,
+  swcMinify: true,
 };
 
 module.exports = nextConfig;

@@ -61,7 +61,6 @@ export default function AssetCard({ asset }: AssetCardProps) {
             style={{
               transition: "all 0.8s ease-in-out 0s",
             }}
-            unoptimized={true}
             className="aspect-square h-full w-full rounded-b-lg object-cover transition-transform duration-200 ease-in-out group-hover:scale-[1.1]"
           />
         )}
@@ -71,8 +70,9 @@ export default function AssetCard({ asset }: AssetCardProps) {
             {asset.likes} {asset.likes > 1 ? "likes" : "like"}
           </p>
         </div>
+        /
         <div
-          className={`absolute left-0 top-0 z-[1] h-full w-full bg-gradient-to-b from-[#00000000] to-[#${theme === "dark" ? "000" : "FFF"}]`}
+          className={`absolute left-0 top-0 z-[1] h-full w-full bg-gradient-to-b from-[#00000000] ${theme === "dark" ? "to-[#00000088]" : "to-[#FFFFFF88]"}`}
         />
       </CardContent>
     </Card>

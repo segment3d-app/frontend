@@ -1,5 +1,9 @@
-import Explore from "@/components/explore/explore";
+import Explore, { Asset } from "@/components/explore/explore";
+import { serverAxios } from "@/utils/axios";
 
-export default function ExplorePage() {
-  return <Explore />;
+export const dynamic = "force-dynamic";
+
+export default async function ExplorePage() {
+  const { data } = await serverAxios.get<{ assets: Asset[] }>("/api/assets");
+  return <Explore assets={data.assets} />;
 }
