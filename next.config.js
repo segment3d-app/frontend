@@ -18,7 +18,26 @@ const nextConfig = {
     ];
   },
   images: {
-    domains: ["localhost", "storage", "0.0.0.0"],
+    remotePatterns: [
+      {
+        protocol: "http",
+        hostname: "storage",
+        port: "8081",
+        pathname: "/files/**",
+      },
+      {
+        protocol: "http",
+        hostname: "localhost",
+        port: "8081",
+        pathname: "/files/**",
+      },
+      {
+        protocol: "http",
+        hostname: "0.0.0.0",
+        port: "8081",
+        pathname: "/files/**",
+      },
+    ],
   },
   output: "standalone",
   reactStrictMode: true,

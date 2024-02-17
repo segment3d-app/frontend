@@ -1,7 +1,15 @@
+"use client";
+
+import { FC } from "react";
 import CaptureCard from "../common/capture-card/capture-card";
 import FloatingFilter from "../common/floating-filter/floating-filter";
+import { Asset } from "../explore/explore";
 
-export default function Capture() {
+interface CaptureProps {
+  assets?: Asset[];
+}
+
+const Capture: FC<CaptureProps> = ({ assets }) => {
   return (
     <div className="my-8 w-full">
       <FloatingFilter>
@@ -13,12 +21,15 @@ export default function Capture() {
         </div>
       </FloatingFilter>
       <div className="grid grid-cols-3 gap-4 px-8 pt-4">
-        {Array.from({ length: 5 }).map((_, id) => (
-          <div key={id}>
-            <CaptureCard />
+        {assets?.map((asset) => (
+          <div key={asset.id}>
+            <CaptureCard asset={asset} />
           </div>
         ))}
       </div>
     </div>
   );
-}
+};
+
+Capture.displayName = "Capture";
+export default Capture;
