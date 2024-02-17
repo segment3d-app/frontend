@@ -43,7 +43,7 @@ export default function AssetCard({ asset }: AssetCardProps) {
       >
         {isHovered && asset.assetType === "video" ? (
           <video
-            src={asset.assetUrl}
+            src={`${process.env.NEXT_PUBLIC_API_STORAGE}${asset.assetUrl}`}
             className="aspect-square h-full w-full rounded-b-lg object-cover"
             autoPlay
             loop
@@ -54,7 +54,7 @@ export default function AssetCard({ asset }: AssetCardProps) {
           />
         ) : (
           <Image
-            src={asset.thumbnailUrl}
+            src={`${process.env.NEXT_PUBLIC_CONTAINER_STORAGE}${asset.thumbnailUrl}`}
             width={1000}
             height={1000}
             alt={asset.title}
