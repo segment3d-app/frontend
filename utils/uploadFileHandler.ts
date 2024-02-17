@@ -1,4 +1,4 @@
-import { clientAxios } from "./axios";
+import axios from "axios";
 
 export default async function UploadFileHandler(
   folder: string,
@@ -22,7 +22,7 @@ export default async function UploadFileHandler(
   try {
     const {
       data: { url, message },
-    } = await clientAxios.post("/api/media", form);
+    } = await axios.post("/api/media", form);
     return { error: null, url: url, message: message };
   } catch (err: any) {
     return {

@@ -33,8 +33,8 @@ import Image from "next/image";
 
 import * as Yup from "yup";
 import UploadFileHandler from "@/utils/uploadFileHandler";
-import { clientAxios } from "@/utils/axios";
 import useAuthStore from "@/store/useAuthStore";
+import axios from "axios";
 
 const UploadVideoSchema = Yup.object().shape({
   name: Yup.string().required("name is required"),
@@ -292,7 +292,7 @@ export default function Sidebar() {
           let tempArr = assetUrl?.split("/");
           assetUrl = tempArr?.splice(0, tempArr.length - 1)?.join("/");
         }
-        const { data } = await clientAxios.post(
+        const { data } = await axios.post(
           "/api/assets",
           {
             assetType: uploadedFile?.type,
