@@ -1,4 +1,5 @@
-import Explore, { Asset } from "@/components/explore/explore";
+import Explore from "@/components/explore/explore";
+import { Asset } from "@/model/asset";
 import { serverAxios } from "@/utils/axios";
 
 export const dynamic = "force-dynamic";

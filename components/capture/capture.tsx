@@ -3,7 +3,7 @@
 import { FC } from "react";
 import CaptureCard from "../common/capture-card/capture-card";
 import FloatingFilter from "../common/floating-filter/floating-filter";
-import { Asset } from "../explore/explore";
+import { Asset } from "@/model/asset";
 
 interface CaptureProps {
   assets?: Asset[];

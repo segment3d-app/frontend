@@ -4,28 +4,11 @@
 import { FC } from "react";
 import AssetCard from "../common/asset-card/asset-card";
 import FloatingFilter from "../common/floating-filter/floating-filter";
+import { Asset } from "@/model/asset";
 
 type ExploreProps = {
   assets?: Asset[];
 };
-
-export interface Asset {
-  assetType: string;
-  gaussianUrl: string;
-  id: string;
-  likes: number;
-  pointCloudUrl: string;
-  slug: string;
-  status: string;
-  thumbnailUrl: string;
-  assetUrl: string;
-  title: string;
-  user: {
-    avatar: string;
-    id: string;
-    name: string;
-  };
-}
 
 const Explore: FC<ExploreProps> = ({ assets }) => {
   return (

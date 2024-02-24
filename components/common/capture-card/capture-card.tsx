@@ -1,5 +1,14 @@
-import { Asset } from "@/components/explore/explore";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Asset } from "@/model/asset";
 import { DotsVerticalIcon, HeartIcon } from "@radix-ui/react-icons";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -18,14 +27,25 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset }) => {
         <div className="grid-row-2 !m-0 grid w-full">
           <p>{asset?.title}</p>
         </div>
-        <div>
-          <DotsVerticalIcon className="h-[18px] w-[18px] cursor-pointer" />
-        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <DotsVerticalIcon className="h-[18px] w-[18px] cursor-pointer" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="ml-[32px] w-[186px]">
+            <DropdownMenuLabel>Action</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem className="cursor-pointer" onClick={() => {}}>
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </CardHeader>
       <CardContent
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="relative aspect-square cursor-pointer rounded-b-lg bg-[#27272A] p-0"
+        className="group relative aspect-square cursor-pointer overflow-hidden rounded-b-lg bg-[#27272A] p-0"
       >
         {isHovered && asset.assetType === "video" ? (
           <video
