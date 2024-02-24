@@ -1,5 +1,5 @@
 import { Asset } from "@/components/explore/explore";
-import { getUserFallbackHandler } from "@/components/header/components/user-avatar";
+import { getUserFallbackHandler } from "@/components/common/header/components/user-avatar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { DotsVerticalIcon, HeartIcon } from "@radix-ui/react-icons";
