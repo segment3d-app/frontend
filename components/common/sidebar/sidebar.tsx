@@ -30,6 +30,7 @@ import {
   SelectValue,
 } from "../../ui/select";
 import Image from "next/image";
+import { toast as sonner } from "sonner";
 
 import * as Yup from "yup";
 import UploadFileHandler from "@/utils/uploadFileHandler";
@@ -282,10 +283,8 @@ export default function Sidebar() {
         uploadedFile?.type === "images" ? true : false,
       );
       if (!error) {
-        toast({
-          title: "Success",
+        sonner("Success", {
           description: message,
-          variant: "default",
         });
         let assetUrl = (url?.length ?? 0) >= 1 ? url?.[0] : "";
         if (uploadedFile?.type === "images") {
@@ -302,10 +301,8 @@ export default function Sidebar() {
           },
           { headers: { Authorization: `Bearer ${accessToken}` } },
         );
-        toast({
-          title: "Success",
+        sonner("Success", {
           description: data?.message,
-          variant: "default",
         });
 
         setUploadedFile(null);

@@ -16,9 +16,10 @@ import { FC, useState } from "react";
 
 interface CaptureCardProps {
   asset: Asset;
+  removeAssetHandler: (id: string) => void;
 }
 
-const CaptureCard: FC<CaptureCardProps> = ({ asset }) => {
+const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
   const { theme } = useTheme();
   const [isHovered, setIsHovered] = useState(false);
   return (
@@ -29,13 +30,16 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset }) => {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <DotsVerticalIcon className="h-[18px] w-[18px] cursor-pointer" />
+            <DotsVerticalIcon className="!m-0 h-[18px] w-[18px] cursor-pointer" />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="ml-[32px] w-[186px]">
             <DropdownMenuLabel>Action</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem className="cursor-pointer" onClick={() => {}}>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => removeAssetHandler(asset.id)}
+              >
                 Delete
               </DropdownMenuItem>
             </DropdownMenuGroup>

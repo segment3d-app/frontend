@@ -1,7 +1,7 @@
-import { Asset } from "@/components/explore/explore";
 import { getUserFallbackHandler } from "@/components/common/header/components/user-avatar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Asset } from "@/model/asset";
 import { DotsVerticalIcon, HeartIcon } from "@radix-ui/react-icons";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -32,9 +32,7 @@ export default function AssetCard({ asset }: AssetCardProps) {
             by <span className="cursor-pointer">{asset.user.name}</span>
           </p>
         </div>
-        <div>
-          <DotsVerticalIcon className="h-[18px] w-[18px] cursor-pointer" />
-        </div>
+        <DotsVerticalIcon className="!m-0 h-[18px] w-[18px] cursor-pointer" />
       </CardHeader>
       <CardContent
         onMouseEnter={() => setIsHovered(true)}

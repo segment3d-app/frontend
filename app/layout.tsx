@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/provider/theme-provider";
 import { Header } from "@/components/common/header/header";
+import { Toaster as Sooner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import GoogleOAuthProvider from "@/components/provider/google-oauth-provider";
 
@@ -24,6 +25,7 @@ export default function RootLayout({
         <GoogleOAuthProvider>
           <ThemeProvider>
             <Toaster />
+            <Sooner />
             <Header />
             {children}
           </ThemeProvider>

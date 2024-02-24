@@ -1,15 +1,34 @@
 "use client";
 
-import { FC } from "react";
+import { FC, useState } from "react";
 import CaptureCard from "../common/capture-card/capture-card";
 import FloatingFilter from "../common/floating-filter/floating-filter";
 import { Asset } from "@/model/asset";
+import { removeAsset } from "@/app/capture/action";
+import { useToast } from "../ui/use-toast";
 
 interface CaptureProps {
   assets?: Asset[];
 }
 
 const Capture: FC<CaptureProps> = ({ assets }) => {
+  const [curAssets, setCurAssets] = useState<Asset[] | undefined>(assets);
+  const { toast } = useToast();
+
+  const removeAssetHandler = (id: string) => {
+    try {
+      removeAsset(id);
+      setCurAssets(curAssets?.filter((asset) => asset.id != id));
+      toast({ title: "Success", description: "Asset is removed" });
+    } catch {
+      toast({
+        title: "Error",
+        description: "Failed to remove asset",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="my-8 w-full">
       <FloatingFilter>
@@ -21,9 +40,12 @@ const Capture: FC<CaptureProps> = ({ assets }) => {
         </div>
       </FloatingFilter>
       <div className="grid grid-cols-3 gap-4 px-8 pt-4">
-        {assets?.map((asset) => (
+        {curAssets?.map((asset) => (
           <div key={asset.id}>
-            <CaptureCard asset={asset} />
+            <CaptureCard
+              asset={asset}
+              removeAssetHandler={removeAssetHandler}
+            />
           </div>
         ))}
       </div>
