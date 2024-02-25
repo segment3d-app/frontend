@@ -6,6 +6,8 @@ import FloatingFilter from "../common/floating-filter/floating-filter";
 import { Asset } from "@/model/asset";
 import { removeAsset } from "@/app/capture/action";
 import { useToast } from "../ui/use-toast";
+import { Button } from "../ui/button";
+import { UploadIcon } from "@radix-ui/react-icons";
 
 interface CaptureProps {
   assets?: Asset[];
@@ -31,12 +33,28 @@ const Capture: FC<CaptureProps> = ({ assets }) => {
 
   return (
     <div className="my-8 w-full">
-      <FloatingFilter>
+      <FloatingFilter
+        additionalButon={
+          <Button
+            variant="outline"
+            className="flex gap-4"
+            size="lg"
+            onClick={() =>
+              document
+                .getElementById("create-gaussian-splatting-trigger")
+                ?.click()
+            }
+          >
+            <span>Create</span>
+            <UploadIcon />
+          </Button>
+        }
+      >
         <div className="mb-4 flex flex-col gap-4 text-center">
           <div className="px-8 text-2xl font-bold">
             Explore the Frontier of 3D Gaussian Here
           </div>
-          <div>Create your first NeRF capture today.</div>
+          <div>Create your first 3D Gaussian asset today.</div>
         </div>
       </FloatingFilter>
       <div className="grid grid-cols-3 gap-4 px-8 pt-4">

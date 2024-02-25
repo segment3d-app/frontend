@@ -1,18 +1,9 @@
 import Capture from "@/components/capture/capture";
-import { Asset } from "@/model/asset";
-import { serverAxios } from "@/utils/axios";
-import { cookies } from "next/headers";
+import { getMyAsset } from "./action";
 
 export const dynamic = "force-dynamic";
 
 export default async function CapturePage() {
-  const { data } = await serverAxios.get<{ assets: Asset[] }>(
-    "/api/assets/me",
-    {
-      headers: {
-        Authorization: `Bearer ${cookies().get("accessToken")?.value}`,
-      },
-    },
-  );
-  return <Capture assets={data.assets} />;
+  const assets = await getMyAsset();
+  return <Capture assets={assets} />;
 }

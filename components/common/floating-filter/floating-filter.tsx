@@ -1,16 +1,20 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, FC } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronDownIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
 
 interface FloatingFilterProps {
+  additionalButon?: React.ReactNode;
   children: React.ReactNode;
 }
 
-export default function FloatingFilter({ children }: FloatingFilterProps) {
+const FloatingFilter: FC<FloatingFilterProps> = ({
+  additionalButon,
+  children,
+}) => {
   const filterRef = useRef<HTMLDivElement>(null);
   const [isSticky, setIsSticky] = useState(false);
 
@@ -40,10 +44,13 @@ export default function FloatingFilter({ children }: FloatingFilterProps) {
         <div
           className={`flex w-full items-center justify-between gap-8 p-4 ${isSticky ? "flex-row" : "flex-col-reverse items-center !gap-4"}`}
         >
-          <Button variant="outline" className="flex gap-4" size="lg">
-            <span>Filter</span>
-            <ChevronDownIcon />
-          </Button>
+          <div className="flex gap-4">
+            <Button variant="outline" className="flex gap-4" size="lg">
+              <span>Filter</span>
+              <ChevronDownIcon />
+            </Button>
+            {additionalButon}
+          </div>
           <div className="relative w-full max-w-[300px]">
             <Input
               className="h-[40px] max-w-[300px]"
@@ -56,4 +63,7 @@ export default function FloatingFilter({ children }: FloatingFilterProps) {
       </div>
     </>
   );
-}
+};
+
+FloatingFilter.displayName = "Floating Filter";
+export default FloatingFilter;

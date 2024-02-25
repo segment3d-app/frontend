@@ -20,3 +20,21 @@ export async function removeAsset(id: string): Promise<Asset> {
     throw error;
   }
 }
+
+export async function getMyAsset(): Promise<Asset[]> {
+  "use server";
+  try {
+    const { data } = await serverAxios.get<{ assets: Asset[] }>(
+      "/api/assets/me",
+      {
+        headers: {
+          Authorization: `Bearer ${cookies().get("accessToken")?.value}`,
+        },
+      },
+    );
+
+    return data.assets;
+  } catch (error) {
+    throw error;
+  }
+}

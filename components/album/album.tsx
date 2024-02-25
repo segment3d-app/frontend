@@ -1,10 +1,30 @@
+"use client";
+
+import { PlusIcon } from "@radix-ui/react-icons";
 import AlbumCard from "../common/album-card/album-card";
 import FloatingFilter from "../common/floating-filter/floating-filter";
+import { Button } from "../ui/button";
 
 export default function Album() {
   return (
     <div className="my-8 w-full">
-      <FloatingFilter>
+      <FloatingFilter
+        additionalButon={
+          <Button
+            variant="outline"
+            className="flex gap-4"
+            size="lg"
+            onClick={() =>
+              document
+                .getElementById("create-gaussian-splatting-trigger")
+                ?.click()
+            }
+          >
+            <span>Add</span>
+            <PlusIcon />
+          </Button>
+        }
+      >
         <div className="mb-4 flex flex-col gap-4 text-center">
           <div className="px-8 text-2xl font-bold">
             Explore the Frontier of 3D Gaussian Here

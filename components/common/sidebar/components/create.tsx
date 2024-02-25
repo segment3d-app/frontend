@@ -34,6 +34,23 @@ export default function Create() {
                 });
                 return;
               }
+              document.getElementById("create-album-trigger")?.click();
+            }}
+          >
+            Album
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => {
+              if (!getIsAuthenticated()) {
+                document.getElementById("dialog-auth-btn")?.click();
+                toast({
+                  title: "Error",
+                  description: "you need to login first",
+                  variant: "destructive",
+                });
+                return;
+              }
               document
                 .getElementById("create-gaussian-splatting-trigger")
                 ?.click();

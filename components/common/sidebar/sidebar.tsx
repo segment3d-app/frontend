@@ -307,7 +307,10 @@ export default function Sidebar() {
 
         setUploadedFile(null);
         document.getElementById("create-gaussian-splatting-trigger")?.click();
-        route.push("/capture");
+        if (pathName.includes("capture")) {
+        } else {
+          route.push("/capture");
+        }
       } else {
         toast({
           title: "Error",
