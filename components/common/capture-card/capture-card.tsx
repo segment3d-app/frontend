@@ -12,6 +12,7 @@ import { Asset } from "@/model/asset";
 import { DotsVerticalIcon, HeartIcon } from "@radix-ui/react-icons";
 import { useTheme } from "next-themes";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { FC, useState } from "react";
 
 interface CaptureCardProps {
@@ -22,6 +23,8 @@ interface CaptureCardProps {
 const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
   const { theme } = useTheme();
   const [isHovered, setIsHovered] = useState(false);
+  const router = useRouter();
+
   return (
     <Card className="p-0">
       <CardHeader className="flex flex-row items-center gap-2 p-2 text-xs">
@@ -47,9 +50,12 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
         </DropdownMenu>
       </CardHeader>
       <CardContent
-        onMouseEnter={() => setIsHovered(true)}
+        onMouseEnter={() => asset.status === "finished" && setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className="group relative aspect-square cursor-pointer overflow-hidden rounded-b-lg bg-[#27272A] p-0"
+        className={`relative aspect-square  overflow-hidden rounded-b-lg bg-[#27272A] p-0 ${asset.status === "finished" ? "cursor-pointer" : "cursor-not-allowed"}`}
+        onClick={() =>
+          asset.status === "finished" && router.push(`/assets/${asset.slug}`)
+        }
       >
         {isHovered && asset.assetType === "video" ? (
           <video
@@ -71,18 +77,35 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
             style={{
               transition: "all 0.8s ease-in-out 0s",
             }}
-            className="aspect-square h-full w-full rounded-b-lg object-cover transition-transform duration-200 ease-in-out group-hover:scale-[1.1]"
+            className={`aspect-square h-full w-full rounded-b-lg object-cover transition-transform duration-200 ease-in-out ${isHovered && "scale-[1.1]"}`}
           />
         )}
-        <div className="absolute bottom-4 left-4 z-[2] flex cursor-pointer flex-row items-center gap-2 text-xs">
-          <HeartIcon className="h-[16px] w-[16px]" />
-          <p>
-            {asset.likes} {asset.likes > 1 ? "likes" : "like"}
-          </p>
-        </div>
-        <div
-          className={`absolute left-0 top-0 z-[1] h-full w-full bg-gradient-to-b from-[#00000000] ${theme === "dark" ? "to-[#00000088]" : "to-[#FFFFFF88]"}`}
-        />
+        {asset.status === "finished" ? (
+          <>
+            <div className="absolute bottom-4 left-4 z-[2] flex cursor-pointer flex-row items-center gap-2 text-xs">
+              <HeartIcon className="h-[16px] w-[16px]" />
+              <p>
+                {asset.likes} {asset.likes > 1 ? "likes" : "like"}
+              </p>
+            </div>
+            <div
+              className={`absolute left-0 top-0 z-[1] h-full w-full bg-gradient-to-b from-[#00000000] ${theme === "dark" ? "to-[#00000088]" : "to-[#FFFFFF88]"}`}
+            />
+          </>
+        ) : (
+          <>
+            <div className="absolute left-1/2 top-1/2 z-[2] flex -translate-x-1/2 -translate-y-1/2 items-center gap-1">
+              <div
+                className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                role="status"
+              />
+              In queue...
+            </div>
+            <div
+              className={`absolute left-0 top-0 z-[1] h-full w-full bg-gradient-to-b ${theme === "dark" ? "from-[#00000099] to-[#00000099]" : "from-[#FFFFFF99] to-[#FFFFFF99]"}`}
+            />
+          </>
+        )}
       </CardContent>
     </Card>
   );
