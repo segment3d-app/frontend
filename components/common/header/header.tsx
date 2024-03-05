@@ -3,8 +3,12 @@
 import ModeToggle from "./components/mode-toggle";
 import UserAvatar from "./components/user-avatar";
 import Navigation from "./components/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export function Header() {
+  const pathname = usePathname();
+  const routes = useRouter();
   return (
     <header className="text-md sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-[64px] max-w-screen-2xl items-center">
@@ -59,8 +63,14 @@ export function Header() {
         </button>
         <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
           <nav className="flex items-center gap-2">
-            <ModeToggle />
-            <UserAvatar />
+            {pathname === "/" ? (
+              <Button onClick={() => routes.push("/explore")}>Explore</Button>
+            ) : (
+              <>
+                <ModeToggle />
+                <UserAvatar />
+              </>
+            )}
           </nav>
         </div>
       </div>

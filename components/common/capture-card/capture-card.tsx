@@ -50,11 +50,11 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
         </DropdownMenu>
       </CardHeader>
       <CardContent
-        onMouseEnter={() => asset.status === "finished" && setIsHovered(true)}
+        onMouseEnter={() => asset.status === "completed" && setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className={`relative aspect-square  overflow-hidden rounded-b-lg bg-[#27272A] p-0 ${asset.status === "finished" ? "cursor-pointer" : "cursor-not-allowed"}`}
+        className={`relative aspect-square  overflow-hidden rounded-b-lg bg-[#27272A] p-0 ${asset.status === "completed" ? "cursor-pointer" : "cursor-not-allowed"}`}
         onClick={() =>
-          asset.status === "finished" && router.push(`/assets/${asset.slug}`)
+          asset.status === "completed" && router.push(`/assets/${asset.slug}`)
         }
       >
         {isHovered && asset.assetType === "video" ? (
@@ -80,7 +80,7 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
             className={`aspect-square h-full w-full rounded-b-lg object-cover transition-transform duration-200 ease-in-out ${isHovered && "scale-[1.1]"}`}
           />
         )}
-        {asset.status === "finished" ? (
+        {asset.status === "completed" ? (
           <>
             <div className="absolute bottom-4 left-4 z-[2] flex cursor-pointer flex-row items-center gap-2 text-xs">
               <HeartIcon className="h-[16px] w-[16px]" />
@@ -94,12 +94,16 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
           </>
         ) : (
           <>
-            <div className="absolute left-1/2 top-1/2 z-[2] flex -translate-x-1/2 -translate-y-1/2 items-center gap-1">
+            <div className="absolute left-1/2 top-1/2 z-[2] flex w-full -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-1">
               <div
                 className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
                 role="status"
               />
-              In queue...
+              {asset.status
+                .split(" ")
+                .map((el) => el.charAt(0).toUpperCase() + el.slice(1))
+                .join(" ")}
+              ...
             </div>
             <div
               className={`absolute left-0 top-0 z-[1] h-full w-full bg-gradient-to-b ${theme === "dark" ? "from-[#00000099] to-[#00000099]" : "from-[#FFFFFF99] to-[#FFFFFF99]"}`}

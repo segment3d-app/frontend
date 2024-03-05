@@ -1,16 +1,23 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import AssetCard from "../common/asset-card/asset-card";
 import FloatingFilter from "../common/floating-filter/floating-filter";
 import { Asset } from "@/model/asset";
+import { useTheme } from "next-themes";
 
 type ExploreProps = {
   assets?: Asset[];
 };
 
 const Explore: FC<ExploreProps> = ({ assets }) => {
+  const { theme, setTheme } = useTheme();
+  useEffect(() => {
+    if (!theme) {
+      setTheme("dark");
+    }
+  }, [theme, setTheme]);
   return (
     <div className="my-8 w-full">
       <FloatingFilter>
