@@ -36,6 +36,7 @@ import * as Yup from "yup";
 import UploadFileHandler from "@/utils/uploadFileHandler";
 import useAuthStore from "@/store/useAuthStore";
 import axios from "axios";
+import { useTheme } from "next-themes";
 
 const UploadVideoSchema = Yup.object().shape({
   name: Yup.string().required("name is required"),
@@ -70,6 +71,7 @@ export default function Sidebar() {
         }[]
       | null;
   } | null>(null);
+  const { theme } = useTheme();
 
   const SIDEBAR_DATA = [
     {
@@ -360,7 +362,7 @@ export default function Sidebar() {
               <DialogTitle>Upload Video</DialogTitle>
               <div className="my-4 flex w-full cursor-pointer justify-center ">
                 <div
-                  className="flex h-[236px] w-[410px] flex-col items-center justify-center gap-4 rounded-lg bg-[#FFFFFF0A] px-8 text-center text-sm hover:bg-[#FFFFFF0F]"
+                  className={`flex h-[236px] w-[410px] flex-col items-center justify-center gap-4 rounded-lg bg-[#FFFFFF0A] px-8 text-center text-sm hover:bg-[#FFFFFF0F] ${theme == "light" && "bg-[#0000000A] hover:bg-[#0000000F]"}`}
                   onClick={openDirectory}
                 >
                   {isLoading ? (
