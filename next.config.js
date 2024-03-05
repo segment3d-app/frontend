@@ -33,7 +33,7 @@ const nextConfig = {
       },
       {
         protocol: "http",
-        hostname: "0.0.0.0",
+        hostname: "34.142.178.123",
         port: "8081",
         pathname: "/files/**",
       },

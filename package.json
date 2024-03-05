@@ -11,6 +11,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@compai/font-recursive": "^0.0.4",
     "@google-cloud/storage": "^7.7.0",
     "@mkkellogg/gaussian-splats-3d": "^0.2.2",
     "@radix-ui/react-avatar": "^1.0.4",
@@ -25,6 +26,7 @@
     "@radix-ui/react-toast": "^1.1.5",
     "@radix-ui/react-toggle": "^1.0.3",
     "@react-oauth/google": "^0.12.1",
+    "@types/three": "^0.162.0",
     "axios": "^1.6.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
@@ -41,6 +43,7 @@
     "sonner": "^1.4.1",
     "tailwind-merge": "^2.2.0",
     "tailwindcss-animate": "^1.0.7",
+    "three": "^0.162.0",
     "yup": "^1.3.3",
     "zustand": "^4.5.0"
   },
