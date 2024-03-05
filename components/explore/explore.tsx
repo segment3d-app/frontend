@@ -9,6 +9,8 @@ import { useTheme } from "next-themes";
 import Image from "next/image";
 import { Button } from "../ui/button";
 import { UploadIcon } from "@radix-ui/react-icons";
+import useAuthStore from "@/store/useAuthStore";
+import { useToast } from "../ui/use-toast";
 
 type ExploreProps = {
   assets?: Asset[];
@@ -16,11 +18,24 @@ type ExploreProps = {
 
 const Explore: FC<ExploreProps> = ({ assets }) => {
   const { theme, setTheme } = useTheme();
+  const { getIsAuthenticated } = useAuthStore();
+  const { toast } = useToast();
+
   useEffect(() => {
     if (!theme) {
       setTheme("dark");
     }
   }, [theme, setTheme]);
+
+  const isNotLoginHandler = () => {
+    document.getElementById("dialog-auth-btn")?.click();
+    toast({
+      title: "Error",
+      description: "you need to login first",
+      variant: "destructive",
+    });
+  };
+
   return (
     <div className="my-8 w-full">
       <FloatingFilter>
@@ -56,11 +71,15 @@ const Explore: FC<ExploreProps> = ({ assets }) => {
               variant="outline"
               className="mt-4 flex gap-4"
               size="lg"
-              onClick={() =>
+              onClick={() => {
+                if (!getIsAuthenticated()) {
+                  isNotLoginHandler();
+                  return;
+                }
                 document
                   .getElementById("create-gaussian-splatting-trigger")
-                  ?.click()
-              }
+                  ?.click();
+              }}
             >
               <span>Create 3D Asset</span>
               <UploadIcon />

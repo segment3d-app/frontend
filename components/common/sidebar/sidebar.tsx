@@ -362,7 +362,7 @@ export default function Sidebar() {
               <DialogTitle>Upload Video</DialogTitle>
               <div className="my-4 flex w-full cursor-pointer justify-center ">
                 <div
-                  className={`flex h-[236px] w-[410px] flex-col items-center justify-center gap-4 rounded-lg bg-[#FFFFFF0A] px-8 text-center text-sm hover:bg-[#FFFFFF0F] ${theme == "light" && "bg-[#0000000A] hover:bg-[#0000000F]"}`}
+                  className={`flex h-[236px] w-[410px] flex-col items-center justify-center gap-4 rounded-lg bg-[#FFFFFF0A] px-8 text-center text-sm hover:bg-[#FFFFFF0F] ${theme === "light" && "!hover:bg-[#0000000F] !bg-[#0000000A]"}`}
                   onClick={openDirectory}
                 >
                   {isLoading ? (

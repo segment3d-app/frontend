@@ -14,5 +14,6 @@ export interface Asset {
   thumbnailUrl: string;
   title: string;
   updatedAt: string;
+  isLikedByMe: boolean;
   user: User;
 }

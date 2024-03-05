@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { googleLogout } from "@react-oauth/google";
 import Auth from "@/components/auth/auth";
 import { PersonIcon } from "@radix-ui/react-icons";
+import axios from "axios";
 
 export const getUserFallbackHandler = (
   fullname: string | null | undefined,
@@ -68,7 +69,7 @@ export default function UserAvatar() {
               <Button
                 variant="default"
                 size="sm"
-                onClick={() => {
+                onClick={async () => {
                   googleLogout();
                   clear();
                   toast({
@@ -76,6 +77,7 @@ export default function UserAvatar() {
                     description: "You already signout",
                     variant: "default",
                   });
+                  await axios.post("/api/auth/signout");
                 }}
               >
                 Signout
