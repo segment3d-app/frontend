@@ -1,12 +1,14 @@
 import { serverAxios } from "@/utils/axios";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   const data = await req.json();
-  const authorizationHeader = req.headers.get("Authorization");
   try {
     const res = await serverAxios.post("/api/assets", data, {
-      headers: { Authorization: authorizationHeader },
+      headers: {
+        Authorization: `Bearer ${cookies().get("accessToken")?.value}`,
+      },
     });
     return NextResponse.json(res.data, {
       status: res.status,
@@ -20,7 +22,11 @@ export async function POST(req: Request) {
 
 export async function GET() {
   try {
-    const res = await serverAxios.get("/api/assets");
+    const res = await serverAxios.get("/api/assets", {
+      headers: {
+        Authorization: `Bearer ${cookies().get("accessToken")?.value}`,
+      },
+    });
     return NextResponse.json(res.data, {
       status: res.status,
     });

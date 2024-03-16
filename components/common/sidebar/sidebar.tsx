@@ -4,6 +4,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Create from "./components/create";
 import {
   CameraIcon,
+  Cross2Icon,
   FilePlusIcon,
   MixIcon,
   RocketIcon,
@@ -19,7 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "../../ui/button";
 import UploadIcon from "./components/upload-icon";
-import { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useState } from "react";
 import { useToast } from "../../ui/use-toast";
 import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
 import {
@@ -31,23 +32,29 @@ import {
 } from "../../ui/select";
 import Image from "next/image";
 import { toast as sonner } from "sonner";
+import { debounce } from "lodash";
 
 import * as Yup from "yup";
 import UploadFileHandler from "@/utils/uploadFileHandler";
 import useAuthStore from "@/store/useAuthStore";
 import axios from "axios";
 import { useTheme } from "next-themes";
+import { Tag } from "@/model/tag";
 
 const UploadVideoSchema = Yup.object().shape({
   name: Yup.string().required("name is required"),
   privacy: Yup.string()
     .oneOf(["private", "public"], "privacy should be one of private or poblic")
     .required("privacy is required"),
+  tags: Yup.array().of(Yup.string()),
+  newTag: Yup.string(),
 });
 
 interface Create3DAssetForm {
   name: string;
   privacy: string;
+  tags: string[];
+  newTag: string;
 }
 
 export default function Sidebar() {
@@ -55,7 +62,9 @@ export default function Sidebar() {
   const route = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
-  const { accessToken, getIsAuthenticated } = useAuthStore();
+  const { getIsAuthenticated } = useAuthStore();
+  const [currentTag, setCurrentTag] = useState<Tag[]>([]);
+  const [isFetchingTag, setIsFetchingTag] = useState<boolean>(false);
   const [uploadedFile, setUploadedFile] = useState<{
     type: "images" | "video";
     vidData?: {
@@ -293,16 +302,13 @@ export default function Sidebar() {
           let tempArr = assetUrl?.split("/");
           assetUrl = tempArr?.splice(0, tempArr.length - 1)?.join("/");
         }
-        const { data } = await axios.post(
-          "/api/assets",
-          {
-            assetType: uploadedFile?.type,
-            assetUrl: assetUrl,
-            isPrivate: values.privacy === "private" ? true : false,
-            title: values.name,
-          },
-          { headers: { Authorization: `Bearer ${accessToken}` } },
-        );
+        const { data } = await axios.post("/api/assets", {
+          assetType: uploadedFile?.type,
+          assetUrl: assetUrl,
+          isPrivate: values.privacy === "private" ? true : false,
+          title: values.name,
+          tags: values.tags,
+        });
         sonner("Success", {
           description: data?.message,
         });
@@ -329,6 +335,21 @@ export default function Sidebar() {
 
     setSubmitting(false);
   };
+
+  const debouncedApiCall = debounce(async (searchTerm: string) => {
+    setIsFetchingTag(true);
+    try {
+      const {
+        data: { tags },
+      }: { data: { tags: Tag[] } } = await axios.get(
+        `/api/tags/search?keyword=${searchTerm}`,
+      );
+      if (tags) {
+        setCurrentTag(tags);
+      }
+    } catch (error) {}
+    setIsFetchingTag(false);
+  }, 500);
 
   return (
     <div
@@ -397,12 +418,20 @@ export default function Sidebar() {
                 initialValues={{
                   name: "",
                   privacy: "",
+                  tags: [] as string[],
+                  newTag: "",
                 }}
                 onSubmit={create3DAssetHandler}
                 validationSchema={UploadVideoSchema}
               >
-                {({ isSubmitting, setFieldValue }) => (
-                  <Form>
+                {({ values, isSubmitting, setFieldValue }) => (
+                  <Form
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                      }
+                    }}
+                  >
                     <DialogTitle>Fill Asset Attribute</DialogTitle>
                     <div className="my-4 grid min-h-[300px] w-full grid-cols-5 gap-6">
                       <div className="col-span-2 flex h-full items-center rounded-lg border-[0.2px]">
@@ -468,53 +497,176 @@ export default function Sidebar() {
                           </div>
                         )}
                       </div>
+
                       <div className="col-span-3">
-                        <div className="grid grid-cols-2 gap-6">
-                          <div className="col-span-2 grid gap-1">
-                            <label
-                              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                              htmlFor="name"
-                            >
-                              Title
-                            </label>
-                            <Field
-                              name="name"
-                              id="name"
-                              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
-                              placeholder={
-                                uploadedFile?.vidData?.file?.name.split(
-                                  ".",
-                                )[0] || "asset name"
-                              }
-                              type="text"
-                            />
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="col-span-2">
+                            <div>
+                              <label
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                htmlFor="name"
+                              >
+                                Title
+                              </label>
+                              <Field
+                                name="name"
+                                id="name"
+                                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                                placeholder={
+                                  uploadedFile?.vidData?.file?.name.split(
+                                    ".",
+                                  )[0] || "asset name"
+                                }
+                                type="text"
+                              />
+                            </div>
                             <div className="px-4 text-xs text-red-500">
                               <ErrorMessage name="name" />
                             </div>
                           </div>
 
-                          <div className="col-span-2 grid gap-1">
+                          <div>
                             <label
                               className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                              htmlFor="name"
+                              htmlFor="newTag"
                             >
-                              Privacy
+                              Tags
                             </label>
-                            <Select
-                              onValueChange={(val) =>
-                                setFieldValue("privacy", val)
-                              }
-                            >
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="None" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="private">Private</SelectItem>
-                                <SelectItem value="public">Public</SelectItem>
-                              </SelectContent>
-                            </Select>
+                            <Field
+                              name="newTag"
+                              id="newTag"
+                              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                              placeholder="Enter your tags"
+                              type="text"
+                              onKeyDown={(
+                                e: React.KeyboardEvent<HTMLInputElement>,
+                              ) => {
+                                if (
+                                  e.key === "Enter" &&
+                                  e.currentTarget.value.trim() !== ""
+                                ) {
+                                  e.preventDefault();
+                                  let newTags = [...values.tags];
+                                  if (
+                                    !values.tags.includes(
+                                      e.currentTarget.value.trim(),
+                                    )
+                                  ) {
+                                    newTags = [
+                                      ...newTags,
+                                      e.currentTarget.value.trim(),
+                                    ];
+                                  }
+                                  setFieldValue("tags", newTags);
+                                  setFieldValue("newTag", "");
+                                  e.currentTarget.value = "";
+                                }
+                              }}
+                              onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>,
+                              ) => {
+                                setFieldValue("newTag", e.currentTarget.value);
+                                debouncedApiCall(e.currentTarget.value);
+                              }}
+                            />
+                          </div>
+
+                          <div>
+                            <div>
+                              <label
+                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                htmlFor="name"
+                              >
+                                Privacy
+                              </label>
+                              <Select
+                                onValueChange={(val) =>
+                                  setFieldValue("privacy", val)
+                                }
+                              >
+                                <SelectTrigger className="w-full">
+                                  <SelectValue placeholder="None" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="private">
+                                    Private
+                                  </SelectItem>
+                                  <SelectItem value="public">Public</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
                             <div className="px-4 text-xs text-red-500">
                               <ErrorMessage name="privacy" />
+                            </div>
+                          </div>
+
+                          <div className="col-span-2 flex flex-col">
+                            {(currentTag.length > 0 || isFetchingTag) && (
+                              <div className="mt-2 flex flex-col">
+                                <div className="text-xs">Recomendation Tag</div>
+                                {!isFetchingTag && (
+                                  <div className="flex flex-wrap gap-2 text-xs">
+                                    {currentTag.map((tag) => (
+                                      <div
+                                        className="group relative cursor-pointer rounded-lg bg-[#0000000A] px-4 py-1 hover:bg-[#0000000F]"
+                                        key={tag.id}
+                                        onClick={() => {
+                                          let newTags = [...values.tags];
+                                          if (!values.tags.includes(tag.name)) {
+                                            newTags = [...newTags, tag.name];
+                                          }
+                                          setFieldValue("tags", newTags);
+                                          setFieldValue("newTag", "");
+                                          setCurrentTag([]);
+                                        }}
+                                      >
+                                        {tag.name}
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                {isFetchingTag && (
+                                  <div className="flex w-full items-center justify-center">
+                                    <div
+                                      className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
+                                      role="status"
+                                    />
+                                    <span>Loading...</span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+
+                            <div
+                              className={`flex flex-col ${currentTag.length ? "mt-4" : "mt-2"}`}
+                            >
+                              <div className="text-xs">Your Tag</div>
+                              <div className="flex flex-wrap gap-2 text-xs">
+                                {values.tags.map((tag, id) => (
+                                  <div
+                                    className="group relative cursor-pointer rounded-lg bg-[#0000000A] px-4 py-1 hover:bg-[#0000000F]"
+                                    key={`${tag}-${id}`}
+                                  >
+                                    {tag}
+                                    <div
+                                      onClick={() =>
+                                        setFieldValue(
+                                          "tags",
+                                          values.tags.filter(
+                                            (curTag) => curTag != tag,
+                                          ),
+                                        )
+                                      }
+                                      className="invisible absolute right-[2px] top-[2px] group-hover:visible"
+                                    >
+                                      <Cross2Icon className="h-[10px] w-[10px]" />
+                                    </div>
+                                  </div>
+                                ))}
+                                {!values.tags.length && (
+                                  <div className="text-xs">-</div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </div>

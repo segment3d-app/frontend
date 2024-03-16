@@ -20,7 +20,7 @@ const Viewer: React.FC = () => {
   useEffect(() => {
     if (view) {
       view
-        .addSplatScene("/sample/point_cloud 7.ply", {
+        .addSplatScene("/sample/point_cloud 7.cleaned.ply", {
           showLoadingSpinner: true,
         })
         .then(() => {
