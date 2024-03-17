@@ -5,13 +5,17 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const keyword = searchParams.get("keyword");
+  const limit = searchParams.get("limit");
 
   try {
-    const res = await serverAxios.get(`/api/tags/search?keyword=${keyword}`, {
-      headers: {
-        Authorization: `Bearer ${cookies().get("accessToken")?.value}`,
+    const res = await serverAxios.get(
+      `/api/tags/search?keyword=${keyword}&limit=${limit}`,
+      {
+        headers: {
+          Authorization: `Bearer ${cookies().get("accessToken")?.value}`,
+        },
       },
-    });
+    );
     return NextResponse.json(res.data, {
       status: res.status,
     });

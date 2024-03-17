@@ -40,6 +40,7 @@ import useAuthStore from "@/store/useAuthStore";
 import axios from "axios";
 import { useTheme } from "next-themes";
 import { Tag } from "@/model/tag";
+import { getAllTag } from "@/app/action";
 
 const UploadVideoSchema = Yup.object().shape({
   name: Yup.string().required("name is required"),
@@ -339,11 +340,7 @@ export default function Sidebar() {
   const debouncedApiCall = debounce(async (searchTerm: string) => {
     setIsFetchingTag(true);
     try {
-      const {
-        data: { tags },
-      }: { data: { tags: Tag[] } } = await axios.get(
-        `/api/tags/search?keyword=${searchTerm}`,
-      );
+      const tags = await getAllTag(searchTerm, 5);
       if (tags) {
         setCurrentTag(tags);
       }

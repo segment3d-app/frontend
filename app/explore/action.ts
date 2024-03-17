@@ -4,24 +4,7 @@ import { Asset } from "@/model/asset";
 import { serverAxios } from "@/utils/axios";
 import { cookies } from "next/headers";
 
-export async function removeAsset(id: string): Promise<Asset> {
-  "use server";
-  try {
-    const { data } = await serverAxios.delete<{ asset: Asset }>(
-      `/api/assets/${id}`,
-      {
-        headers: {
-          Authorization: `Bearer ${cookies().get("accessToken")?.value}`,
-        },
-      },
-    );
-    return data.asset;
-  } catch (error) {
-    throw error;
-  }
-}
-
-export async function getMyAsset(
+export async function getAllAsset(
   search: string,
   filter: string[],
 ): Promise<Asset[]> {
@@ -37,7 +20,8 @@ export async function getMyAsset(
       params.append("filter", filter.join(","));
     }
 
-    let url = `/api/assets/me?${params.toString()}`;
+    let url = `/api/assets?${params.toString()}`;
+
     const { data } = await serverAxios.get<{ assets: Asset[] }>(url, {
       headers: {
         Authorization: `Bearer ${cookies().get("accessToken")?.value}`,

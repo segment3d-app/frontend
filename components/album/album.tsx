@@ -1,7 +1,6 @@
 "use client";
 
 import { PlusIcon } from "@radix-ui/react-icons";
-import AlbumCard from "../common/album-card/album-card";
 import FloatingFilter from "../common/floating-filter/floating-filter";
 import { Button } from "../ui/button";
 import Image from "next/image";
@@ -10,6 +9,7 @@ export default function Album() {
   return (
     <div className="my-8 w-full">
       <FloatingFilter
+        needFilter={false}
         additionalButon={
           <Button
             variant="outline"
