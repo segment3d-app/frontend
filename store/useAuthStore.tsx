@@ -12,10 +12,12 @@ interface AuthStore {
   user?: User | null;
   accessToken?: string | null;
   expires?: string | null;
+  mode: "dark" | "light";
   setUser: (user: User) => void;
   updateUser: (user: User, data: Partial<User>) => void;
   setAccessToken: (accessToken: string) => void;
   getIsAuthenticated: () => boolean;
+  setMode: (mode: "dark" | "light") => void;
   clear: () => void;
 }
 
@@ -25,6 +27,7 @@ const useAuthStore = create<AuthStore>()(
       user: null,
       accessToken: null,
       expires: null,
+      mode: "dark",
       setUser: (user: User) => set({ user }),
       updateUser: (data) =>
         set((state) => ({ user: { ...state.user, ...data } })),
@@ -37,6 +40,11 @@ const useAuthStore = create<AuthStore>()(
         return get().expires
           ? new Date() < new Date(get().expires as string)
           : false;
+      },
+      setMode: (mode: "dark" | "light") => {
+        set({
+          mode: mode,
+        });
       },
       clear: () =>
         set({

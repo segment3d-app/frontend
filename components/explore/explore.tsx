@@ -63,12 +63,6 @@ const Explore: FC<ExploreProps> = ({ assets }) => {
     reFetchAsset();
   }, [assetQuery]);
 
-  useEffect(() => {
-    if (!theme) {
-      setTheme("dark");
-    }
-  }, [theme, setTheme]);
-
   const isNotLoginHandler = () => {
     document.getElementById("dialog-auth-btn")?.click();
     toast({

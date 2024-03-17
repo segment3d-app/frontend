@@ -11,9 +11,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import useAuthStore from "@/store/useAuthStore";
 
 export default function ModeToggle() {
   const { setTheme } = useTheme();
+  const { mode, setMode } = useAuthStore();
+
+  React.useEffect(() => {
+    setTheme(mode);
+  }, [mode, setTheme]);
 
   return (
     <DropdownMenu>
@@ -25,10 +31,18 @@ export default function ModeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
+        <DropdownMenuItem
+          onClick={() => {
+            setMode("light");
+          }}
+        >
           Light
         </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
+        <DropdownMenuItem
+          onClick={() => {
+            setMode("dark");
+          }}
+        >
           Dark
         </DropdownMenuItem>
       </DropdownMenuContent>
