@@ -22,7 +22,7 @@ export default function Create() {
         <DropdownMenuLabel>Choose Mode</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem
+          {/* <DropdownMenuItem
             className="cursor-pointer"
             onClick={() => {
               if (!getIsAuthenticated()) {
@@ -38,7 +38,7 @@ export default function Create() {
             }}
           >
             Album
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
           <DropdownMenuItem
             className="cursor-pointer"
             onClick={() => {

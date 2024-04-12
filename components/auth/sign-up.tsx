@@ -1,25 +1,22 @@
-import { Button } from "@/components/ui/button";
+"use client";
+
 import {
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogClose,
-  DialogDescription,
-} from "@/components/ui/dialog";
-import GoogleLogo from "./google-logo";
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik";
 import * as Yup from "yup";
-import { useGoogleLogin } from "@react-oauth/google";
+import { Button } from "../ui/button";
+import GoogleLogo from "./google-logo";
+import { FC } from "react";
 import useAuthStore from "@/store/useAuthStore";
-import { useToast } from "@/components/ui/use-toast";
-import { Dispatch, SetStateAction } from "react";
-import { AuthType } from "./auth";
-import axios from "axios";
-
-interface SignupDialogProps {
-  setAuthType: Dispatch<SetStateAction<string>>;
-}
+import { google, signup } from "@/app/auth/action";
+import { useGoogleLogin } from "@react-oauth/google";
+import { User } from "@/model/user";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface SignupForm {
   email: string;
@@ -38,9 +35,10 @@ const SignupSchema = Yup.object().shape({
     .required("password is required"),
 });
 
-export function SignupDialog({ setAuthType }: SignupDialogProps) {
+const SignUp: FC = () => {
+  const router = useRouter();
+  const query = useSearchParams();
   const { setAccessToken, setUser } = useAuthStore();
-  const { toast } = useToast();
 
   const signupWithCredentialHandler = async (
     values: SignupForm,
@@ -48,80 +46,54 @@ export function SignupDialog({ setAuthType }: SignupDialogProps) {
   ) => {
     setSubmitting(true);
     try {
-      const {
-        data: {
-          accessToken,
-          message,
-          user: { id, avatar, email, name },
-        },
-      } = await axios.post("/api/auth/signup", values);
-      setUser({ name: name, id: id, email: email, image: avatar });
-      setAccessToken(accessToken);
-      toast({
-        title: "Login Success",
-        description: message,
-        variant: "default",
-      });
-      document.getElementById("close-login-popup")?.click();
-    } catch (err: any) {
-      toast({
-        title: "Error",
-        description: err?.response?.data?.error,
-        variant: "destructive",
-      });
-    }
+      const { accessToken, user } = await signup(
+        values.email,
+        values.name,
+        values.password,
+      );
+      successfullyLoginHandler(user, accessToken);
+    } catch (err: any) {}
     setSubmitting(false);
   };
 
   const signupWithGoogleHandler = useGoogleLogin({
-    onSuccess: async ({ access_token }) => {
+    onSuccess: async ({ access_token: googleToken }) => {
       try {
-        const {
-          data: {
-            accessToken,
-            user: { id, avatar, email, name },
-          },
-        } = await axios.post("/api/auth/google", {
-          token: access_token,
-        });
-        setUser({ name: name, id: id, email: email, image: avatar });
-        setAccessToken(accessToken);
-        toast({
-          title: "Signup Success",
-          description: "Registration success",
-          variant: "default",
-        });
-        document.getElementById("close-login-popup")?.click();
-      } catch (err: any) {
-        toast({
-          title: "Error",
-          description: err?.response?.data?.error,
-          variant: "destructive",
-        });
-      }
+        const { accessToken, user } = await google(googleToken);
+        successfullyLoginHandler(user, accessToken);
+      } catch (err: any) {}
     },
-    onError: (errorResponse) => {
-      toast({
-        title: "Error",
-        description: errorResponse.error_description,
-        variant: "destructive",
-      });
-    },
+    onError: () => {},
     flow: "implicit",
   });
 
+  const successfullyLoginHandler = (user: User, accessToken: string) => {
+    setUser({
+      name: user.name,
+      id: user.id,
+      email: user.email,
+      image: user.avatar,
+    });
+    setAccessToken(accessToken);
+    const redirect = decodeURIComponent(query.get("redirect") ?? "");
+    router.push(redirect);
+  };
+
   return (
-    <DialogContent className="sm:max-w-[425px]">
-      <DialogHeader>
+    <Card>
+      {/* Header */}
+      <CardHeader>
         <div className="mt-5 flex flex-col space-y-2 text-center">
-          <DialogTitle className="text-2xl font-semibold tracking-tight">
+          <CardTitle className="text-2xl font-semibold tracking-tight">
             Register your account
-          </DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground">
+          </CardTitle>
+          <CardDescription className="text-sm text-muted-foreground">
             Fill the form bellow to regiter your account
-          </DialogDescription>
+          </CardDescription>
         </div>
-      </DialogHeader>
+      </CardHeader>
+
+      {/* Body */}
       <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
         <div className="grid gap-6">
           <Formik
@@ -133,7 +105,7 @@ export function SignupDialog({ setAuthType }: SignupDialogProps) {
             onSubmit={signupWithCredentialHandler}
             validationSchema={SignupSchema}
           >
-            {({ isSubmitting, errors, touched }) => (
+            {({ isSubmitting }) => (
               <Form>
                 <div className="grid gap-2">
                   <div className="grid gap-1">
@@ -231,20 +203,24 @@ export function SignupDialog({ setAuthType }: SignupDialogProps) {
           </Button>
         </div>
       </div>
-      <DialogFooter>
-        <div className="w-full px-8 text-center text-sm text-muted-foreground">
-          Don&apos;t have an account?{" "}
+
+      {/* Footer */}
+      <CardFooter>
+        <div className="mt-2 w-full px-8 text-center text-sm text-muted-foreground">
+          Already have an account?{" "}
           <span
             className="cursor-pointer underline underline-offset-4 hover:text-primary"
             onClick={() => {
-              setAuthType(AuthType.SIGNIN);
+              document.getElementById("sign-in-trigger")?.click();
             }}
           >
-            Signin
+            Sign In
           </span>
         </div>
-      </DialogFooter>
-      <DialogClose id="close-login-popup" className="hidden" />
-    </DialogContent>
+      </CardFooter>
+    </Card>
   );
-}
+};
+
+SignUp.displayName = "Sign In";
+export default SignUp;

@@ -9,10 +9,9 @@ import {
 import useAuthStore from "@/store/useAuthStore";
 import { useToast } from "@/components/ui/use-toast";
 import { googleLogout } from "@react-oauth/google";
-import Auth from "@/components/auth/auth";
 import { PersonIcon } from "@radix-ui/react-icons";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export const getUserFallbackHandler = (
   fullname: string | null | undefined,
@@ -28,6 +27,7 @@ export default function UserAvatar() {
   const { toast } = useToast();
   const { user, clear, getIsAuthenticated } = useAuthStore();
   const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <>
@@ -79,8 +79,9 @@ export default function UserAvatar() {
                     description: "You already signout",
                     variant: "default",
                   });
+
                   await axios.post("/api/auth/signout");
-                  router.push("/explore");
+                  router.push(`/auth?redirect=${encodeURIComponent(pathname)}`);
                 }}
               >
                 Signout
@@ -89,7 +90,7 @@ export default function UserAvatar() {
           </PopoverContent>
         </Popover>
       ) : (
-        <Auth />
+        <Button onClick={() => router.push("/")}>Sign In</Button>
       )}
     </>
   );

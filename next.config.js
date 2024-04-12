@@ -18,6 +18,7 @@ const nextConfig = {
     ];
   },
   images: {
+    domains: ["34.101.221.152"],
     remotePatterns: [
       {
         protocol: "http",

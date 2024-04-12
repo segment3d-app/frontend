@@ -8,7 +8,7 @@ export default async function ExplorePage() {
           <div className="px-8 text-2xl font-bold">
             Explore the Frontier of 3D Gaussian Here
           </div>
-          <div>Create your first NeRF capture today.</div>
+          <div>Create your first 3D Gaussian asset today.</div>
         </div>
       </FloatingFilter>
       <div className="flex w-full items-center justify-center">

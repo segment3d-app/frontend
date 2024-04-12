@@ -1,7 +1,7 @@
 "use client";
 
 import { useTheme } from "next-themes";
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
 import WebIcon from "./components/web-icon";
@@ -9,8 +9,11 @@ import AppleIcon from "./components/apple-icon";
 
 const Home: FC = () => {
   const { setTheme } = useTheme();
-  setTheme("light");
   const routes = useRouter();
+
+  useEffect(() => {
+    setTheme("light");
+  }, [setTheme]);
 
   return (
     <div className="grid max-h-[calc(100vh-64px)] w-full grid-cols-2">

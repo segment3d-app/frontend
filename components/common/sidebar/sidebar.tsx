@@ -106,21 +106,21 @@ export default function Sidebar() {
         route.push("/capture");
       },
     },
+    // {
+    //   id: 3,
+    //   name: "Album",
+    //   path: "/album",
+    //   icon: <MixIcon className="h-[20px] w-[20px]" />,
+    //   onClick: () => {
+    //     if (!getIsAuthenticated()) {
+    //       isNotLoginHandler();
+    //       return;
+    //     }
+    //     route.push("/album");
+    //   },
+    // },
     {
       id: 3,
-      name: "Album",
-      path: "/album",
-      icon: <MixIcon className="h-[20px] w-[20px]" />,
-      onClick: () => {
-        if (!getIsAuthenticated()) {
-          isNotLoginHandler();
-          return;
-        }
-        route.push("/album");
-      },
-    },
-    {
-      id: 4,
       name: <Create />,
       icon: <FilePlusIcon className="h-[20px] w-[20px]" />,
       onClick: () => {},

@@ -30,7 +30,7 @@ export default function Album() {
           <div className="px-8 text-2xl font-bold">
             Explore the Frontier of 3D Gaussian Here
           </div>
-          <div>Create your first NeRF capture today.</div>
+          <div>Create your first 3D Gaussian asset today.</div>
         </div>
       </FloatingFilter>
       <div className="mt-8 flex h-full w-full flex-col items-center px-8">

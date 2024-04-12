@@ -72,21 +72,25 @@ export default function Navigation() {
                       Segment3d App
                     </div>
                     <p className="text-sm leading-tight text-muted-foreground">
-                      Developed to help you to create 3d assets easily
+                      This platform is designed to simplify the creation of 3D
+                      assets for users.
                     </p>
                   </a>
                 </NavigationMenuLink>
               </li>
-              <ListItem href="/docs" title="Repository">
-                Re-usable components built using Radix UI and Tailwind CSS.
+              <ListItem
+                href="https://github.com/orgs/segment3d-app/repositories"
+                title="Repository"
+              >
+                Explore our official GitHub repositories.
               </ListItem>
-              <ListItem href="/docs/installation" title="Papper">
-                How to install dependencies and structure your app.
+              <ListItem href="/paper" title="Papper">
+                Access our research paper.
               </ListItem>
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-        <NavigationMenuItem>
+        {/* <NavigationMenuItem>
           <NavigationMenuTrigger className="text-md">
             Components
           </NavigationMenuTrigger>
@@ -103,14 +107,18 @@ export default function Navigation() {
               ))}
             </ul>
           </NavigationMenuContent>
-        </NavigationMenuItem>
+        </NavigationMenuItem> */}
         <NavigationMenuItem>
-          <Link href="/docs" legacyBehavior passHref>
+          <Link
+            href="http://34.101.221.152:8080/swagger/index.html"
+            legacyBehavior
+            passHref
+          >
             <NavigationMenuLink
               className={navigationMenuTriggerStyle()}
               style={{ fontSize: "16px" }}
             >
-              Documentation
+              API Documentation
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
