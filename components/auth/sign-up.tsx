@@ -17,6 +17,7 @@ import { google, signup } from "@/app/auth/action";
 import { useGoogleLogin } from "@react-oauth/google";
 import { User } from "@/model/user";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useToast } from "../ui/use-toast";
 
 interface SignupForm {
   email: string;
@@ -38,6 +39,7 @@ const SignupSchema = Yup.object().shape({
 const SignUp: FC = () => {
   const router = useRouter();
   const query = useSearchParams();
+  const { toast } = useToast();
   const { setAccessToken, setUser } = useAuthStore();
 
   const signupWithCredentialHandler = async (
@@ -46,28 +48,44 @@ const SignUp: FC = () => {
   ) => {
     setSubmitting(true);
     try {
-      const { accessToken, user } = await signup(
+      const { accessToken, user, message } = await signup(
         values.email,
         values.name,
         values.password,
       );
-      successfullyLoginHandler(user, accessToken);
-    } catch (err: any) {}
+      successfullyLoginHandler(user, accessToken, message);
+    } catch (err: any) {
+      errorLoginHandler();
+    }
     setSubmitting(false);
   };
 
   const signupWithGoogleHandler = useGoogleLogin({
     onSuccess: async ({ access_token: googleToken }) => {
       try {
-        const { accessToken, user } = await google(googleToken);
-        successfullyLoginHandler(user, accessToken);
+        const { accessToken, user, message } = await google(googleToken);
+        successfullyLoginHandler(user, accessToken, message);
       } catch (err: any) {}
     },
-    onError: () => {},
+    onError: () => {
+      errorLoginHandler();
+    },
     flow: "implicit",
   });
 
-  const successfullyLoginHandler = (user: User, accessToken: string) => {
+  const errorLoginHandler = () => {
+    toast({
+      title: "Error",
+      description: "failed to sign up",
+      variant: "destructive",
+    });
+  };
+
+  const successfullyLoginHandler = (
+    user: User,
+    accessToken: string,
+    message: string,
+  ) => {
     setUser({
       name: user.name,
       id: user.id,
@@ -75,7 +93,12 @@ const SignUp: FC = () => {
       image: user.avatar,
     });
     setAccessToken(accessToken);
-    const redirect = decodeURIComponent(query.get("redirect") ?? "");
+    toast({
+      title: "Success",
+      description: message ?? "success to sign up",
+      variant: "default",
+    });
+    const redirect = decodeURIComponent(query.get("redirect") ?? "/explore");
     router.push(redirect);
   };
 
