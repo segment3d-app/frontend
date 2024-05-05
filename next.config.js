@@ -3,7 +3,7 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: "/assets/:slug",
+        source: "/assets/s/:slug",
         headers: [
           {
             key: "Cross-Origin-Opener-Policy",

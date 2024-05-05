@@ -66,6 +66,7 @@ const PointCloudViewer: React.FC<PointCloudViewerProps> = ({ plyFilePath }) => {
 
     // Cleanup
     return () => {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
       mountRef.current?.removeChild(renderer.domElement);
       window.removeEventListener("resize", handleResize);
     };
