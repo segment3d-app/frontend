@@ -20,9 +20,12 @@ const Viewer: React.FC = () => {
   useEffect(() => {
     if (view) {
       view
-        .addSplatScene("/sample/point_cloud 7.cleaned.ply", {
-          showLoadingSpinner: true,
-        })
+        .addSplatScene(
+          "https://storage.googleapis.com/segment3d-app/test.ply",
+          {
+            showLoadingSpinner: true,
+          },
+        )
         .then(() => {
           view.start();
         });

@@ -33,6 +33,10 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
   const [showLove, setShowLove] = useState(false);
   const [showUnlove, setShowUnlove] = useState(false);
 
+  const handleOnClick = () => {
+    window.location.href = `/assets/s/${asset.slug}`;
+  };
+
   const handleDoubleClick = async () => {
     setShowLove(true);
     if (!asset.isLikedByMe) {
@@ -95,9 +99,7 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
         onMouseEnter={() => asset.status === "completed" && setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={`relative aspect-square  overflow-hidden rounded-b-lg bg-[#27272A] p-0 ${asset.status === "completed" ? "cursor-pointer" : "cursor-not-allowed"}`}
-        onClick={() =>
-          asset.status === "completed" && router.push(`/assets/${asset.slug}`)
-        }
+        onClick={() => asset.status === "completed" && handleOnClick()}
         onDoubleClick={() => asset.status === "completed" && handleDoubleClick}
       >
         {isHovered && asset.assetType === "video" ? (

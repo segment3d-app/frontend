@@ -3,7 +3,7 @@
 import React, { useRef, useEffect } from "react";
 import * as THREE from "three";
 import { PLYLoader } from "three/examples/jsm/loaders/PLYLoader.js";
-import { useGesture } from "@use-gesture/react";
+import { useGesture, useMove, useScroll, useWheel } from "@use-gesture/react";
 
 interface PointCloudViewerProps {
   plyFilePath: string;
@@ -13,52 +13,97 @@ const PointCloudViewer: React.FC<PointCloudViewerProps> = ({ plyFilePath }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera>();
 
-  useGesture(
-    {
-      onDrag: (state) => {
-        console.log("drag");
-        const [x, y] = state.movement;
-        const sensitivity = 0.01; // Adjust sensitivity as needed
-
-        if (cameraRef.current) {
-          const camera = cameraRef.current;
-          const radius = camera.position.length(); // Distance from the origin
-
-          // Calculate the new position of the camera around the origin
-          const newX = radius * Math.cos(sensitivity * x);
-          const newZ = radius * Math.sin(sensitivity * x);
-
-          // Set the new position
-          camera.position.x = newX;
-          camera.position.z = newZ;
-
-          // Calculate rotation around the y-axis
-          camera.rotation.y -= sensitivity * y;
-
-          // Calculate the new target position (always facing the origin)
-          const target = new THREE.Vector3(0, 0, 0);
-          camera.lookAt(target);
-        }
-      },
-      onPinch: (state) => {
-        console.log("pinch");
-        // console.log(state);
-        if (cameraRef.current) {
-          console.log("da", state.da);
-          console.log("origin", state.origin);
-          console.log("offset", state.offset);
-          cameraRef.current.position.z += state.da[0]; // Adjust zoom speed as needed
-        }
-      },
-      onScroll: (state) => {
-        console.log("scroll");
-        // console.log(state);
-      },
+  useWheel(
+    (state) => {
+      const zoomSpeed = 0.1;
+      const zoomMultiplier = 1;
+      const [x, y] = state.delta;
+      const zoomAmount = (x + y) * zoomSpeed * zoomMultiplier;
+      if (cameraRef.current && state.down) {
+        cameraRef.current.position.z -= zoomAmount;
+      } else if (cameraRef.current && !state.down) {
+        cameraRef.current.position.z += zoomAmount;
+      }
     },
     {
       target: mountRef,
     },
   );
+
+  useMove(
+    (state) => {
+      const [x, y] = state.movement;
+      const sensitivity = 0.01;
+
+      if (cameraRef.current) {
+        const camera = cameraRef.current;
+        const radius = camera.position.length();
+
+        let newX = camera.position.x;
+        let newY = camera.position.y;
+
+        // Adjust the camera's position based on the movement
+        if (Math.abs(x) > Math.abs(y)) {
+          // Horizontal movement
+          camera.rotateY(-x * sensitivity);
+        } else {
+          // Vertical movement
+          camera.rotateX(-y * sensitivity);
+        }
+
+        // Calculate the new target position (always facing the origin)
+        const target = new THREE.Vector3(0, 0, 0);
+        camera.lookAt(target);
+      }
+    },
+    {
+      target: mountRef,
+    },
+  );
+
+  // useGesture(
+  //   {
+  //     onDrag: (state) => {
+  //       // console.log("drag");
+  //       const [x, y] = state.movement;
+  //       const sensitivity = 0.01; // Adjust sensitivity as needed
+
+  //       if (cameraRef.current) {
+  //         const camera = cameraRef.current;
+  //         const radius = camera.position.length(); // Distance from the origin
+
+  //         // Calculate the new position of the camera around the origin
+  //         const newX = radius * Math.cos(sensitivity * x);
+  //         const newXZ = radius * Math.sin(sensitivity * x);
+
+  //         const newY = radius * Math.cos(sensitivity * y);
+  //         const newYZ = radius * Math.sin(sensitivity * y)
+
+  //         if (x > y) {
+  //           camera.position.x = newX;
+  //           camera.position.z = newXZ;
+  //         } else {
+  //           camera.position.y = newY;
+  //           camera.position.z = newYZ;
+  //         }
+
+  //         // Calculate the new target position (always facing the origin)
+  //         const target = new THREE.Vector3(0, 0, 0);
+  //         camera.lookAt(target);
+  //       }
+  //     },
+  //     onPinch: (state) => {
+  //       if (cameraRef.current) {
+  //         cameraRef.current.position.z += state.da[0]; // Adjust zoom speed as needed
+  //       }
+  //     },
+  //     onScroll: (state) => {
+  //     },
+  //   },
+  //   {
+  //     target: mountRef,
+  //   },
+  // );
 
   // const { bind } = useGestureResponder({
   //   onStartShouldSet: () => true,
