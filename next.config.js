@@ -18,7 +18,7 @@ const nextConfig = {
     ];
   },
   images: {
-    domains: ["34.101.221.152"],
+    domains: ["34.142.178.123"],
     remotePatterns: [
       {
         protocol: "http",
@@ -34,7 +34,7 @@ const nextConfig = {
       },
       {
         protocol: "http",
-        hostname: "34.101.221.152",
+        hostname: "34.142.178.123",
         port: "8081",
         pathname: "/files/**",
       },
