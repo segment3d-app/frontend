@@ -102,7 +102,7 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
         onClick={() => asset.status === "completed" && handleOnClick()}
         onDoubleClick={() => asset.status === "completed" && handleDoubleClick}
       >
-        {isHovered && asset.assetType === "video" ? (
+        {/* {isHovered && asset.assetType === "video" ? (
           <video
             src={`${process.env.NEXT_PUBLIC_API_STORAGE}${asset.assetUrl}`}
             className="aspect-square h-full w-full rounded-b-lg object-cover"
@@ -113,18 +113,18 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
               transition: "all 0.8s ease-in-out 0s",
             }}
           />
-        ) : (
-          <Image
-            src={`${process.env.NEXT_PUBLIC_CONTAINER_STORAGE}${asset.thumbnailUrl}`}
-            width={1000}
-            height={1000}
-            alt={asset.title}
-            style={{
-              transition: "all 0.8s ease-in-out 0s",
-            }}
-            className={`aspect-square h-full w-full rounded-b-lg object-cover transition-transform duration-200 ease-in-out ${isHovered && "scale-[1.1]"}`}
-          />
-        )}
+        ) : ( */}
+        <Image
+          src={`${process.env.NEXT_PUBLIC_CONTAINER_STORAGE}${asset.thumbnailUrl}`}
+          width={1000}
+          height={1000}
+          alt={asset.title}
+          style={{
+            transition: "all 0.8s ease-in-out 0s",
+          }}
+          className={`aspect-square h-full w-full rounded-b-lg object-cover transition-transform duration-200 ease-in-out ${isHovered && "scale-[1.1]"}`}
+        />
+        {/* )} */}
         {asset.status === "completed" ? (
           <>
             <div className="absolute bottom-4 left-4 z-[2] flex cursor-pointer flex-row items-center gap-2 text-xs">
