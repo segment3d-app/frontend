@@ -68,7 +68,6 @@ const PointCloudViewer: React.FC<PointCloudViewerProps> = ({ plyFilePath }) => {
     camera.position.z = 5;
     cameraRef.current = camera;
 
-    // Controls for accumulating camera transformations
     const cameraControls = new THREE.Object3D();
     scene.add(cameraControls);
     cameraControls.add(camera);
@@ -80,9 +79,22 @@ const PointCloudViewer: React.FC<PointCloudViewerProps> = ({ plyFilePath }) => {
     const loader = new PLYLoader();
     loader.load(plyFilePath, (geometry) => {
       const material = new THREE.PointsMaterial({
-        size: 0.05,
-        // vertexColors: THREE.VertexColors,
+        size: 0.001,
+        vertexColors: true,
       });
+
+      const colors = geometry.attributes.color;
+      const numVertices = geometry.getAttribute("position").count;
+
+      for (let i = 0; i < numVertices; i++) {
+        const color = new THREE.Color(
+          colors.getX(i),
+          colors.getY(i),
+          colors.getZ(i),
+        );
+        geometry.attributes.color.setXYZ(i, color.r, color.g, color.b);
+      }
+
       const points = new THREE.Points(geometry, material);
       scene.add(points);
       geometry.computeBoundingBox();
