@@ -37,10 +37,11 @@ import { debounce } from "lodash";
 import * as Yup from "yup";
 import UploadFileHandler from "@/utils/uploadFileHandler";
 import useAuthStore from "@/store/useAuthStore";
-import axios from "axios";
 import { useTheme } from "next-themes";
 import { Tag } from "@/model/tag";
 import { getAllTag } from "@/app/action";
+import { createAsset } from "@/app/explore/action";
+import { CreateAssetRequest } from "@/dao/createAsset";
 
 const UploadVideoSchema = Yup.object().shape({
   name: Yup.string().required("name is required"),
@@ -67,7 +68,7 @@ export default function Sidebar() {
   const [currentTag, setCurrentTag] = useState<Tag[]>([]);
   const [isFetchingTag, setIsFetchingTag] = useState<boolean>(false);
   const [uploadedFile, setUploadedFile] = useState<{
-    type: "images" | "video";
+    type: "lidar" | "non_lidar";
     vidData?: {
       file?: File | null;
       dataUrl?: string | null;
@@ -140,7 +141,7 @@ export default function Sidebar() {
     if (isLoading) return;
     const fileInput = document.createElement("input");
     fileInput.type = "file";
-    fileInput.accept = "image/*,video/*";
+    fileInput.accept = "image/*";
     fileInput.multiple = true;
     fileInput.addEventListener(
       "change",
@@ -157,9 +158,11 @@ export default function Sidebar() {
     if (files && length) {
       if (files[0].type.includes("image")) {
         handleFileImagesUpload(files);
-      } else if (files[0].type.includes("video")) {
-        handleFileVideoUpload(files);
-      } else {
+      }
+      // else if (files[0].type.includes("video")) {
+      //   handleFileVideoUpload(files);
+      // }
+      else {
         toast({
           title: "Error",
           description: "format file is not supported",
@@ -207,7 +210,7 @@ export default function Sidebar() {
       const fileUploadedURL = await readVideoFileAsDataURL(file);
       if (typeof fileUploadedURL === "string") {
         setUploadedFile({
-          type: "video",
+          type: "non_lidar",
           vidData: {
             file: file,
             dataUrl: fileUploadedURL,
@@ -224,10 +227,10 @@ export default function Sidebar() {
   };
 
   const handleFileImagesUpload = (files: FileList) => {
-    if (files.length < 20) {
+    if (files.length < 5) {
       toast({
         title: "Error",
-        description: "You need to upload at least 20 images",
+        description: "You need to upload at least 5 images",
         variant: "destructive",
       });
       return;
@@ -254,7 +257,7 @@ export default function Sidebar() {
     Promise.all(promises)
       .then((result) => {
         setUploadedFile({
-          type: "images",
+          type: "non_lidar",
           imgData: result as {
             file?: File | null | undefined;
             dataUrl?: string | null | undefined;
@@ -278,7 +281,7 @@ export default function Sidebar() {
     setSubmitting(true);
 
     try {
-      let folderName = `assets/${values.name}/source`;
+      let folderName = `${values.name}/photos`;
       const {
         error,
         url,
@@ -289,29 +292,27 @@ export default function Sidebar() {
         message?: string | null;
       } = await UploadFileHandler(
         folderName,
-        uploadedFile?.type === "video"
-          ? uploadedFile?.vidData?.file
-          : uploadedFile?.imgData?.map((data) => data.file as File),
-        uploadedFile?.type === "images" ? true : false,
+        uploadedFile?.imgData?.map((data) => data.file as File),
+        true,
       );
       if (!error) {
         sonner("Success", {
           description: message,
         });
         let assetUrl = (url?.length ?? 0) >= 1 ? url?.[0] : "";
-        if (uploadedFile?.type === "images") {
-          let tempArr = assetUrl?.split("/");
-          assetUrl = tempArr?.splice(0, tempArr.length - 1)?.join("/");
-        }
-        const { data } = await axios.post("/api/assets", {
-          assetType: uploadedFile?.type,
-          assetUrl: assetUrl,
+
+        let tempArr = assetUrl?.split("/");
+        assetUrl = tempArr?.splice(0, tempArr.length - 1)?.join("/");
+        const req: CreateAssetRequest = {
           isPrivate: values.privacy === "private" ? true : false,
-          title: values.name,
+          photoDirUrl: assetUrl ?? "",
           tags: values.tags,
-        });
+          title: values.name,
+          type: "non_lidar",
+        };
+        const data = await createAsset(req);
         sonner("Success", {
-          description: data?.message,
+          description: data.message,
         });
 
         setUploadedFile(null);
@@ -377,7 +378,7 @@ export default function Sidebar() {
         <DialogContent className="max-w-[576px]">
           {!uploadedFile ? (
             <>
-              <DialogTitle>Upload Video</DialogTitle>
+              <DialogTitle>Upload Images</DialogTitle>
               <div className="my-4 flex w-full cursor-pointer justify-center ">
                 <div
                   className={`flex h-[236px] w-[410px] flex-col items-center justify-center gap-4 rounded-lg bg-[#FFFFFF0A] px-8 text-center text-sm hover:bg-[#FFFFFF0F] ${theme === "light" && "!hover:bg-[#0000000F] !bg-[#0000000A]"}`}
@@ -396,9 +397,7 @@ export default function Sidebar() {
                       <div>
                         <UploadIcon />
                       </div>
-                      <p>
-                        Upload or drop video with a duration of 2-3 minutes{" "}
-                      </p>
+                      <p>Tap to upload your images here </p>
                     </>
                   )}
                 </div>
@@ -432,7 +431,7 @@ export default function Sidebar() {
                     <DialogTitle>Fill Asset Attribute</DialogTitle>
                     <div className="my-4 grid min-h-[300px] w-full grid-cols-5 gap-6">
                       <div className="col-span-2 flex h-full items-center rounded-lg border-[0.2px]">
-                        {uploadedFile.type === "video" ? (
+                        {/* {uploadedFile.type === "video" ? (
                           <div className="relative h-full w-full">
                             <video
                               src={
@@ -454,45 +453,41 @@ export default function Sidebar() {
                               </p>
                             </div>
                           </div>
-                        ) : (
-                          <div className="grid grid-cols-2">
-                            {uploadedFile.imgData
-                              ?.slice(0, 4)
-                              .map((img, id) => (
-                                <div key={img.file?.name + id.toString()}>
-                                  {id == 3 &&
-                                  (uploadedFile?.imgData?.length ?? 0) > 4 ? (
-                                    <div className="relative">
-                                      <Image
-                                        src={img.dataUrl ?? (img.url as string)}
-                                        width={500}
-                                        height={500}
-                                        alt={img.file?.name ?? ""}
-                                      />
-                                      <div
-                                        style={{
-                                          background:
-                                            "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))",
-                                        }}
-                                        className="absolute left-1/2 top-1/2 flex h-full w-full -translate-x-1/2 -translate-y-1/2 items-center justify-center"
-                                      >
-                                        +
-                                        {(uploadedFile?.imgData?.length ?? 0) -
-                                          4}
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <Image
-                                      src={img.dataUrl ?? (img.url as string)}
-                                      width={500}
-                                      height={500}
-                                      alt={img.file?.name ?? ""}
-                                    />
-                                  )}
+                        ) : ( */}
+                        <div className="grid grid-cols-2">
+                          {uploadedFile.imgData?.slice(0, 4).map((img, id) => (
+                            <div key={img.file?.name + id.toString()}>
+                              {id == 3 &&
+                              (uploadedFile?.imgData?.length ?? 0) > 4 ? (
+                                <div className="relative">
+                                  <Image
+                                    src={img.dataUrl ?? (img.url as string)}
+                                    width={500}
+                                    height={500}
+                                    alt={img.file?.name ?? ""}
+                                  />
+                                  <div
+                                    style={{
+                                      background:
+                                        "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5))",
+                                    }}
+                                    className="absolute left-1/2 top-1/2 flex h-full w-full -translate-x-1/2 -translate-y-1/2 items-center justify-center"
+                                  >
+                                    +{(uploadedFile?.imgData?.length ?? 0) - 4}
+                                  </div>
                                 </div>
-                              ))}
-                          </div>
-                        )}
+                              ) : (
+                                <Image
+                                  src={img.dataUrl ?? (img.url as string)}
+                                  width={500}
+                                  height={500}
+                                  alt={img.file?.name ?? ""}
+                                />
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                        {/* )} */}
                       </div>
 
                       <div className="col-span-3">

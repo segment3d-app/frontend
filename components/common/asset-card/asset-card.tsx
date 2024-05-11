@@ -12,7 +12,6 @@ import {
 import axios from "axios";
 import { useTheme } from "next-themes";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 interface AssetCardProps {
@@ -108,7 +107,7 @@ export default function AssetCard({ asset }: AssetCardProps) {
         onMouseLeave={() => setIsHovered(false)}
         className="group relative aspect-square cursor-pointer overflow-hidden rounded-b-lg p-0"
       >
-        {isHovered && asset.assetType === "video" ? (
+        {/* {isHovered && asset.assetType === "video" ? (
           <video
             src={`${process.env.NEXT_PUBLIC_API_STORAGE}${asset.assetUrl}`}
             className="aspect-square h-full w-full rounded-b-lg object-cover"
@@ -119,18 +118,18 @@ export default function AssetCard({ asset }: AssetCardProps) {
               transition: "all 0.8s ease-in-out 0s",
             }}
           />
-        ) : (
-          <Image
-            src={`${process.env.NEXT_PUBLIC_CONTAINER_STORAGE}${asset.thumbnailUrl}`}
-            width={1000}
-            height={1000}
-            alt={asset.title}
-            style={{
-              transition: "all 0.8s ease-in-out 0s",
-            }}
-            className="aspect-square h-full w-full rounded-b-lg object-cover transition-transform duration-200 ease-in-out group-hover:scale-[1.1]"
-          />
-        )}
+        ) : ( */}
+        <Image
+          src={`${process.env.NEXT_PUBLIC_CONTAINER_STORAGE}${asset.thumbnailUrl}`}
+          width={1000}
+          height={1000}
+          alt={asset.title}
+          style={{
+            transition: "all 0.8s ease-in-out 0s",
+          }}
+          className="aspect-square h-full w-full rounded-b-lg object-cover transition-transform duration-200 ease-in-out group-hover:scale-[1.1]"
+        />
+        {/* )} */}
         <div className="absolute bottom-4 left-4 z-[2] flex cursor-pointer flex-row items-center gap-2 text-xs">
           {asset.isLikedByMe ? (
             <HeartFilledIcon

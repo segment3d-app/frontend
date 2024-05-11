@@ -1,19 +1,22 @@
 import { User } from "./user";
 
 export interface Asset {
-  assetType: string;
-  assetUrl: string;
-  createdAt: string;
-  gaussianUrl: string;
   id: string;
-  isPrivate: boolean;
-  likes: number;
-  pointCloudUrl: string;
-  slug: string;
-  status: string;
-  thumbnailUrl: string;
   title: string;
+  slug: string;
+  type: string;
+  thumbnailUrl: string;
+  photoDirUrl: string;
+  splatUrl: string;
+  pclUrl: string;
+  pclColmapUrl: string;
+  segmentedPclDirUrl: string;
+  segmentedSplatDirUrl: string;
+  isPrivate: boolean;
+  status: string;
+  likes: number;
+  createdAt: string;
   updatedAt: string;
-  isLikedByMe: boolean;
   user: User;
+  isLikedByMe: boolean;
 }

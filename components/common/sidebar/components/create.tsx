@@ -56,7 +56,7 @@ export default function Create() {
                 ?.click();
             }}
           >
-            3D Gaussian Asset
+            Upload Images
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
