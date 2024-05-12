@@ -1,7 +1,16 @@
 import PointCloudViewer from "@/components/viewer/ply-loader";
+import { getAssetDetails } from "../../action";
 
-export default function RenderAsset() {
+export default async function RenderAsset({
+  params,
+}: {
+  params: { slug: string };
+}) {
+  const asset = await getAssetDetails(params.slug);
+  const url = asset.pclUrl ?? asset.pclColmapUrl;
   return (
-    <PointCloudViewer plyFilePath="https://storage.googleapis.com/segment3d-app/test-pcl.ply" />
+    <PointCloudViewer
+      plyFilePath={`${process.env.NEXT_PUBLIC_CONTAINER_STORAGE}${url}`}
+    />
   );
 }
