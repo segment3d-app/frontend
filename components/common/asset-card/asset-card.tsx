@@ -1,6 +1,15 @@
 import { getUserFallbackHandler } from "@/components/common/header/components/user-avatar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
 import { Asset } from "@/model/asset";
 import useAuthStore from "@/store/useAuthStore";
@@ -33,6 +42,27 @@ export default function AssetCard({ asset }: AssetCardProps) {
       description: "you need to login first",
       variant: "destructive",
     });
+  };
+
+  const downloadAsset = (
+    assetUrl: string,
+    fileName: string,
+    fileExtension: string,
+  ) => {
+    fetch(assetUrl)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.download = `${fileName}.${fileExtension}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      })
+      .catch((error) => {
+        console.error("Error downloading file:", error);
+      });
   };
 
   const handleOnClick = () => {
@@ -98,7 +128,62 @@ export default function AssetCard({ asset }: AssetCardProps) {
             by <span className="cursor-pointer">{asset.user.name}</span>
           </p>
         </div>
-        <DotsVerticalIcon className="!m-0 h-[18px] w-[18px] cursor-pointer" />
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <DotsVerticalIcon className="!m-0 h-[18px] w-[18px] cursor-pointer" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="ml-[32px] w-[186px]">
+            <DropdownMenuLabel>Render</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() =>
+                  (window.location.href = `/assets/s/${asset.slug}`)
+                }
+              >
+                See 3D Gaussian Splat
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() =>
+                  (window.location.href = `/assets/p/${asset.slug}`)
+                }
+              >
+                See 3D Poincloud
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuLabel>Download</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() =>
+                  downloadAsset(
+                    `${process.env.NEXT_PUBLIC_API_STORAGE}${asset.splatUrl}`,
+                    asset.title,
+                    "ply",
+                  )
+                }
+              >
+                Download 3D Gaussian Splat
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() =>
+                  downloadAsset(
+                    `${process.env.NEXT_PUBLIC_API_STORAGE}${asset.pclUrl ?? asset.pclColmapUrl}`,
+                    asset.title,
+                    "ply",
+                  )
+                }
+              >
+                Download 3D Poincloud
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </CardHeader>
       <CardContent
         onClick={handleOnClick}

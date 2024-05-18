@@ -9,7 +9,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Asset } from "@/model/asset";
-import useAuthStore from "@/store/useAuthStore";
 import {
   DotsVerticalIcon,
   HeartFilledIcon,
@@ -18,7 +17,6 @@ import {
 import axios from "axios";
 import { useTheme } from "next-themes";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { FC, useState } from "react";
 
 interface CaptureCardProps {
@@ -29,12 +27,32 @@ interface CaptureCardProps {
 const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
   const { theme } = useTheme();
   const [isHovered, setIsHovered] = useState(false);
-  const router = useRouter();
   const [showLove, setShowLove] = useState(false);
   const [showUnlove, setShowUnlove] = useState(false);
 
   const handleOnClick = () => {
     window.location.href = `/assets/s/${asset.slug}`;
+  };
+
+  const downloadAsset = (
+    assetUrl: string,
+    fileName: string,
+    fileExtension: string,
+  ) => {
+    fetch(assetUrl)
+      .then((response) => response.blob())
+      .then((blob) => {
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.download = `${fileName}.${fileExtension}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      })
+      .catch((error) => {
+        console.error("Error downloading file:", error);
+      });
   };
 
   const handleDoubleClick = async () => {
@@ -91,6 +109,56 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
               >
                 Delete
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Render</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() =>
+                    (window.location.href = `/assets/s/${asset.slug}`)
+                  }
+                >
+                  See 3D Gaussian Splat
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() =>
+                    (window.location.href = `/assets/p/${asset.slug}`)
+                  }
+                >
+                  See 3D Poincloud
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
+              <DropdownMenuSeparator />
+              <DropdownMenuLabel>Download</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuGroup>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() =>
+                    downloadAsset(
+                      `${process.env.NEXT_PUBLIC_API_STORAGE}${asset.splatUrl}`,
+                      asset.title,
+                      "ply",
+                    )
+                  }
+                >
+                  Download 3D Gaussian Splat
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() =>
+                    downloadAsset(
+                      `${process.env.NEXT_PUBLIC_API_STORAGE}${asset.pclUrl ?? asset.pclColmapUrl}`,
+                      asset.title,
+                      "ply",
+                    )
+                  }
+                >
+                  Download 3D Poincloud
+                </DropdownMenuItem>
+              </DropdownMenuGroup>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
