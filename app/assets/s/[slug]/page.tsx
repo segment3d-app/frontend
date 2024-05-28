@@ -7,5 +7,9 @@ export default async function RenderAsset({
   params: { slug: string };
 }) {
   const asset = await getAssetDetails(params.slug);
-  return <Viewer />;
+  return (
+    <Viewer
+      splatUrl={`${process.env.NEXT_PUBLIC_API_STORAGE}${asset.splatUrl}`}
+    />
+  );
 }

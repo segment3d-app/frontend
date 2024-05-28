@@ -3,7 +3,11 @@
 import * as GaussianSplats3D from "@mkkellogg/gaussian-splats-3d";
 import { useEffect, useState } from "react";
 
-const Viewer: React.FC = () => {
+interface ViewerProps {
+  splatUrl: string;
+}
+
+const Viewer: React.FC<ViewerProps> = ({ splatUrl }) => {
   const [view, setView] = useState<any | null>();
 
   useEffect(() => {
@@ -20,12 +24,9 @@ const Viewer: React.FC = () => {
   useEffect(() => {
     if (view) {
       view
-        .addSplatScene(
-          "https://storage.googleapis.com/segment3d-app/test.ply",
-          {
-            showLoadingSpinner: true,
-          },
-        )
+        .addSplatScene(splatUrl, {
+          showLoadingSpinner: true,
+        })
         .then(() => {
           view.start();
         });
