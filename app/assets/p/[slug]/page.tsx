@@ -7,7 +7,7 @@ export default async function RenderAsset({
   params: { slug: string };
 }) {
   const asset = await getAssetDetails(params.slug);
-  const url = asset.pclUrl ?? asset.pclColmapUrl;
+  const url = asset.pclUrl || asset.pclColmapUrl;
   return (
     <PointCloudViewer
       plyFilePath={`${process.env.NEXT_PUBLIC_API_STORAGE}${url}`}
