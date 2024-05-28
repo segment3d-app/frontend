@@ -1,22 +1,22 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  headers() {
-    return [
-      {
-        source: "/assets/s/:slug",
-        headers: [
-          {
-            key: "Cross-Origin-Opener-Policy",
-            value: "same-origin",
-          },
-          {
-            key: "Cross-Origin-Embedder-Policy",
-            value: "require-corp",
-          },
-        ],
-      },
-    ];
-  },
+  // headers() {
+  //   return [
+  //     {
+  //       source: "/assets/s/:slug",
+  //       headers: [
+  //         {
+  //           key: "Cross-Origin-Opener-Policy",
+  //           value: "same-origin",
+  //         },
+  //         {
+  //           key: "Cross-Origin-Embedder-Policy",
+  //           value: "require-corp",
+  //         },
+  //       ],
+  //     },
+  //   ];
+  // },
   images: {
     domains: ["103.174.115.248"],
     remotePatterns: [

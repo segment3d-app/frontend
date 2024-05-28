@@ -16,6 +16,7 @@ const Viewer: React.FC<ViewerProps> = ({ splatUrl }) => {
         cameraUp: [0, 1, 0],
         initialCameraPosition: [1, 0, 0],
         initialCameraLookAt: [0, 0, 0],
+        sharedMemoryForWorkers: false,
       });
       setView(viewerInstance);
     }
