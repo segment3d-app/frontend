@@ -152,6 +152,14 @@ export default function AssetCard({ asset }: AssetCardProps) {
               >
                 See 3D Poincloud
               </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() =>
+                  (window.location.href = `/assets/ps/${asset.slug}`)
+                }
+              >
+                See PTv3 Segmentation
+              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuLabel>Download</DropdownMenuLabel>
