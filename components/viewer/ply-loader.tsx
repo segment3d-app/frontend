@@ -12,7 +12,7 @@ interface PointCloudViewerProps {
 const PointCloudViewer: React.FC<PointCloudViewerProps> = ({ plyFilePath }) => {
   const mountRef = useRef<HTMLDivElement>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera>();
-  const cameraControlsRef = useRef<THREE.Object3D>(); // Controls for accumulating camera transformations
+  const cameraControlsRef = useRef<THREE.Object3D>();
 
   useWheel(
     (state) => {

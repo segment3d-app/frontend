@@ -20,3 +20,11 @@ export interface Asset {
   user: User;
   isLikedByMe: boolean;
 }
+
+export enum AssetStatus {
+  GENERATING_SPARSE_POINTCLOUD = "generating sparse point cloud",
+  GENERATING_3D_SPLAT = "generating 3d splat",
+  PROCESSING_PTV3 = "processing ptv3",
+  PROCCESING_SAGA = "processing saga",
+  COMPLETED = "completed",
+}

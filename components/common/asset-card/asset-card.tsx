@@ -21,7 +21,8 @@ import {
 import axios from "axios";
 import { useTheme } from "next-themes";
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import Label from "../label";
 
 interface AssetCardProps {
   asset: Asset;
@@ -34,6 +35,7 @@ export default function AssetCard({ asset }: AssetCardProps) {
   const { theme } = useTheme();
   const { getIsAuthenticated } = useAuthStore();
   const { toast } = useToast();
+  const clickTimeoutRef = useRef<number | null>(null);
 
   const isNotLoginHandler = () => {
     document.getElementById("dialog-auth-btn")?.click();
@@ -66,13 +68,21 @@ export default function AssetCard({ asset }: AssetCardProps) {
   };
 
   const handleOnClick = () => {
-    window.location.href = `/assets/s/${asset.slug}`;
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+    } else {
+      clickTimeoutRef.current = window.setTimeout(() => {
+        window.location.href = `/assets/s/${asset.slug}`;
+        clickTimeoutRef.current = null;
+      }, 1000);
+    }
   };
 
   const handleDoubleClick = async () => {
-    if (!getIsAuthenticated()) {
-      isNotLoginHandler();
-      return;
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
     }
     setShowLove(true);
     if (!asset.isLikedByMe) {
@@ -138,25 +148,49 @@ export default function AssetCard({ asset }: AssetCardProps) {
             <DropdownMenuGroup>
               <DropdownMenuItem
                 className="cursor-pointer"
-                onClick={() =>
-                  (window.location.href = `/assets/s/${asset.slug}`)
-                }
+                onClick={() => {
+                  if (asset.splatUrl) {
+                    window.location.href = `/assets/s/${asset.slug}`;
+                  } else {
+                    toast({
+                      title: "Error",
+                      description: "3d gaussian splat is not yet available",
+                      variant: "destructive",
+                    });
+                  }
+                }}
               >
                 See 3D Gaussian Splat
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer"
-                onClick={() =>
-                  (window.location.href = `/assets/p/${asset.slug}`)
-                }
+                onClick={() => {
+                  if (asset.pclUrl || asset.pclColmapUrl) {
+                    window.location.href = `/assets/p/${asset.slug}`;
+                  } else {
+                    toast({
+                      title: "Error",
+                      description: "3d poincloud have not yeat available",
+                      variant: "destructive",
+                    });
+                  }
+                }}
               >
                 See 3D Poincloud
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer"
-                onClick={() =>
-                  (window.location.href = `/assets/ps/${asset.slug}`)
-                }
+                onClick={() => {
+                  if (asset.segmentedPclDirUrl) {
+                    window.location.href = `/assets/ps/${asset.slug}`;
+                  } else {
+                    toast({
+                      title: "Error",
+                      description: "ptv3 segmentation is not yet available",
+                      variant: "destructive",
+                    });
+                  }
+                }}
               >
                 See PTv3 Segmentation
               </DropdownMenuItem>
@@ -167,27 +201,57 @@ export default function AssetCard({ asset }: AssetCardProps) {
             <DropdownMenuGroup>
               <DropdownMenuItem
                 className="cursor-pointer"
-                onClick={() =>
-                  downloadAsset(
-                    `${process.env.NEXT_PUBLIC_API_STORAGE}${asset.splatUrl}`,
-                    asset.title,
-                    "ply",
-                  )
-                }
+                onClick={() => {
+                  if (asset.splatUrl) {
+                    window.location.href = `${process.env.NEXT_PUBLIC_API_STORAGE}${asset.splatUrl}?isDownload=true`;
+                  } else {
+                    toast({
+                      title: "Error",
+                      description: "3d gaussian splat is not yet available",
+                      variant: "destructive",
+                    });
+                  }
+                }}
               >
                 Download 3D Gaussian Splat
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer"
-                onClick={() =>
-                  downloadAsset(
-                    `${process.env.NEXT_PUBLIC_API_STORAGE}${asset.pclUrl ?? asset.pclColmapUrl}`,
-                    asset.title,
-                    "ply",
-                  )
-                }
+                onClick={() => {
+                  if (asset.pclColmapUrl || asset.pclUrl) {
+                    console.log(
+                      `${process.env.NEXT_PUBLIC_API_STORAGE}${asset.pclColmapUrl || asset.pclUrl}?isDownload=true`,
+                    );
+                    window.location.href = `${process.env.NEXT_PUBLIC_API_STORAGE}${asset.pclColmapUrl || asset.pclUrl}?isDownload=true`;
+                  } else {
+                    toast({
+                      title: "Error",
+                      description: "3d poincloud have not yeat available",
+                      variant: "destructive",
+                    });
+                  }
+                }}
               >
                 Download 3D Poincloud
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => {
+                  if (asset.segmentedPclDirUrl) {
+                    console.log(
+                      `${process.env.NEXT_PUBLIC_API_STORAGE}${asset.segmentedPclDirUrl}?isDownload=true`,
+                    );
+                    window.location.href = `${process.env.NEXT_PUBLIC_API_STORAGE}${asset.segmentedPclDirUrl}?isDownload=true`;
+                  } else {
+                    toast({
+                      title: "Error",
+                      description: "ptv3 segmentation is not yet available",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+              >
+                Download PTv3 segmentation
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
@@ -200,18 +264,9 @@ export default function AssetCard({ asset }: AssetCardProps) {
         onMouseLeave={() => setIsHovered(false)}
         className="group relative aspect-square cursor-pointer overflow-hidden rounded-b-lg p-0"
       >
-        {/* {isHovered && asset.assetType === "video" ? (
-          <video
-            src={`${process.env.NEXT_PUBLIC_API_STORAGE}${asset.assetUrl}`}
-            className="aspect-square h-full w-full rounded-b-lg object-cover"
-            autoPlay
-            loop
-            muted
-            style={{
-              transition: "all 0.8s ease-in-out 0s",
-            }}
-          />
-        ) : ( */}
+        <div className="max-w-3/4 absolute right-2 top-2 z-[2]">
+          <Label label={asset.status} />
+        </div>
         <Image
           src={`${process.env.NEXT_PUBLIC_CONTAINER_STORAGE}${asset.thumbnailUrl}`}
           width={1000}
@@ -222,7 +277,6 @@ export default function AssetCard({ asset }: AssetCardProps) {
           }}
           className="aspect-square h-full w-full rounded-b-lg object-cover transition-transform duration-200 ease-in-out group-hover:scale-[1.1]"
         />
-        {/* )} */}
         <div className="absolute bottom-4 left-4 z-[2] flex cursor-pointer flex-row items-center gap-2 text-xs">
           {asset.isLikedByMe ? (
             <HeartFilledIcon

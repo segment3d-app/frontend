@@ -17,7 +17,9 @@ import {
 import axios from "axios";
 import { useTheme } from "next-themes";
 import Image from "next/image";
-import { FC, useState } from "react";
+import { FC, useState, useRef } from "react";
+import Label from "../label";
+import { useToast } from "@/components/ui/use-toast";
 
 interface CaptureCardProps {
   asset: Asset;
@@ -29,9 +31,19 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [showLove, setShowLove] = useState(false);
   const [showUnlove, setShowUnlove] = useState(false);
+  const clickTimeoutRef = useRef<number | null>(null);
+  const { toast } = useToast();
 
   const handleOnClick = () => {
-    window.location.href = `/assets/s/${asset.slug}`;
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+    } else {
+      clickTimeoutRef.current = window.setTimeout(() => {
+        window.location.href = `/assets/s/${asset.slug}`;
+        clickTimeoutRef.current = null;
+      }, 1000);
+    }
   };
 
   const downloadAsset = (
@@ -56,6 +68,10 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
   };
 
   const handleDoubleClick = async () => {
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
+    }
     setShowLove(true);
     if (!asset.isLikedByMe) {
       asset.likes = asset.likes += 1;
@@ -115,25 +131,49 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
               <DropdownMenuGroup>
                 <DropdownMenuItem
                   className="cursor-pointer"
-                  onClick={() =>
-                    (window.location.href = `/assets/s/${asset.slug}`)
-                  }
+                  onClick={() => {
+                    if (asset.splatUrl) {
+                      window.location.href = `/assets/s/${asset.slug}`;
+                    } else {
+                      toast({
+                        title: "Error",
+                        description: "3d gaussian splat is not yet available",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
                 >
                   See 3D Gaussian Splat
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="cursor-pointer"
-                  onClick={() =>
-                    (window.location.href = `/assets/p/${asset.slug}`)
-                  }
+                  onClick={() => {
+                    if (asset.pclUrl || asset.pclColmapUrl) {
+                      window.location.href = `/assets/p/${asset.slug}`;
+                    } else {
+                      toast({
+                        title: "Error",
+                        description: "3d poincloud have not yeat available",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
                 >
                   See 3D Poincloud
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="cursor-pointer"
-                  onClick={() =>
-                    (window.location.href = `/assets/ps/${asset.slug}`)
-                  }
+                  onClick={() => {
+                    if (asset.segmentedPclDirUrl) {
+                      window.location.href = `/assets/ps/${asset.slug}`;
+                    } else {
+                      toast({
+                        title: "Error",
+                        description: "ptv3 segmentation is not yet available",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
                 >
                   See PTv3 Segmentation
                 </DropdownMenuItem>
@@ -144,27 +184,57 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
               <DropdownMenuGroup>
                 <DropdownMenuItem
                   className="cursor-pointer"
-                  onClick={() =>
-                    downloadAsset(
-                      `${process.env.NEXT_PUBLIC_API_STORAGE}${asset.splatUrl}`,
-                      asset.title,
-                      "ply",
-                    )
-                  }
+                  onClick={() => {
+                    if (asset.splatUrl) {
+                      window.location.href = `${process.env.NEXT_PUBLIC_API_STORAGE}${asset.splatUrl}?isDownload=true`;
+                    } else {
+                      toast({
+                        title: "Error",
+                        description: "3d gaussian splat is not yet available",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
                 >
                   Download 3D Gaussian Splat
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="cursor-pointer"
-                  onClick={() =>
-                    downloadAsset(
-                      `${process.env.NEXT_PUBLIC_API_STORAGE}${asset.pclUrl ?? asset.pclColmapUrl}`,
-                      asset.title,
-                      "ply",
-                    )
-                  }
+                  onClick={() => {
+                    if (asset.pclColmapUrl || asset.pclUrl) {
+                      console.log(
+                        `${process.env.NEXT_PUBLIC_API_STORAGE}${asset.pclColmapUrl || asset.pclUrl}?isDownload=true`,
+                      );
+                      window.location.href = `${process.env.NEXT_PUBLIC_API_STORAGE}${asset.pclColmapUrl || asset.pclUrl}?isDownload=true`;
+                    } else {
+                      toast({
+                        title: "Error",
+                        description: "3d poincloud have not yeat available",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
                 >
                   Download 3D Poincloud
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => {
+                    if (asset.segmentedPclDirUrl) {
+                      console.log(
+                        `${process.env.NEXT_PUBLIC_API_STORAGE}${asset.segmentedPclDirUrl}?isDownload=true`,
+                      );
+                      window.location.href = `${process.env.NEXT_PUBLIC_API_STORAGE}${asset.segmentedPclDirUrl}?isDownload=true`;
+                    } else {
+                      toast({
+                        title: "Error",
+                        description: "ptv3 segmentation is not yet available",
+                        variant: "destructive",
+                      });
+                    }
+                  }}
+                >
+                  Download PTv3 segmentation
                 </DropdownMenuItem>
               </DropdownMenuGroup>
             </DropdownMenuGroup>
@@ -172,24 +242,15 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
         </DropdownMenu>
       </CardHeader>
       <CardContent
-        onMouseEnter={() => asset.status === "completed" && setIsHovered(true)}
+        onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className={`relative aspect-square  overflow-hidden rounded-b-lg bg-[#27272A] p-0 ${asset.status === "completed" ? "cursor-pointer" : "cursor-not-allowed"}`}
-        onClick={() => asset.status === "completed" && handleOnClick()}
-        onDoubleClick={() => asset.status === "completed" && handleDoubleClick}
+        className={`relative aspect-square  cursor-pointer overflow-hidden rounded-b-lg bg-[#27272A] p-0`}
+        onClick={handleOnClick}
+        onDoubleClick={handleDoubleClick}
       >
-        {/* {isHovered && asset.assetType === "video" ? (
-          <video
-            src={`${process.env.NEXT_PUBLIC_API_STORAGE}${asset.assetUrl}`}
-            className="aspect-square h-full w-full rounded-b-lg object-cover"
-            autoPlay
-            loop
-            muted
-            style={{
-              transition: "all 0.8s ease-in-out 0s",
-            }}
-          />
-        ) : ( */}
+        <div className="max-w-3/4 absolute right-2 top-2 z-[2]">
+          <Label label={asset.status} />
+        </div>
         <Image
           src={`${process.env.NEXT_PUBLIC_CONTAINER_STORAGE}${asset.thumbnailUrl}`}
           width={1000}
@@ -200,54 +261,35 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
           }}
           className={`aspect-square h-full w-full rounded-b-lg object-cover transition-transform duration-200 ease-in-out ${isHovered && "scale-[1.1]"}`}
         />
-        {/* )} */}
-        {asset.status === "completed" ? (
-          <>
-            <div className="absolute bottom-4 left-4 z-[2] flex cursor-pointer flex-row items-center gap-2 text-xs">
-              {asset.isLikedByMe ? (
-                <HeartFilledIcon
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    likeButtonClickHandle();
-                  }}
-                  color="#b30f15"
-                  className="h-[16px] w-[16px]"
-                />
-              ) : (
-                <HeartIcon
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    likeButtonClickHandle();
-                  }}
-                  className="h-[16px] w-[16px]"
-                />
-              )}
-              <p>
-                {asset.likes} {asset.likes > 1 ? "likes" : "like"}
-              </p>
-            </div>
-            <div
-              className={`absolute left-0 top-0 z-[1] h-full w-full bg-gradient-to-b from-[#00000000] ${theme === "dark" ? "to-[#00000088]" : "to-[#FFFFFF88]"}`}
-            />
-          </>
-        ) : (
-          <>
-            <div className="absolute left-1/2 top-1/2 z-[2] flex w-full -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-1">
-              <div
-                className="mr-2 inline-block h-4 w-4 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"
-                role="status"
+
+        <>
+          <div className="absolute bottom-4 left-4 z-[2] flex cursor-pointer flex-row items-center gap-2 text-xs">
+            {asset.isLikedByMe ? (
+              <HeartFilledIcon
+                onClick={(e) => {
+                  e.stopPropagation();
+                  likeButtonClickHandle();
+                }}
+                color="#b30f15"
+                className="h-[16px] w-[16px]"
               />
-              {asset.status
-                .split(" ")
-                .map((el) => el.charAt(0).toUpperCase() + el.slice(1))
-                .join(" ")}
-              ...
-            </div>
-            <div
-              className={`absolute left-0 top-0 z-[1] h-full w-full bg-gradient-to-b ${theme === "dark" ? "from-[#00000099] to-[#00000099]" : "from-[#FFFFFF99] to-[#FFFFFF99]"}`}
-            />
-          </>
-        )}
+            ) : (
+              <HeartIcon
+                onClick={(e) => {
+                  e.stopPropagation();
+                  likeButtonClickHandle();
+                }}
+                className="h-[16px] w-[16px]"
+              />
+            )}
+            <p>
+              {asset.likes} {asset.likes > 1 ? "likes" : "like"}
+            </p>
+          </div>
+          <div
+            className={`absolute left-0 top-0 z-[1] h-full w-full bg-gradient-to-b from-[#00000000] ${theme === "dark" ? "to-[#00000088]" : "to-[#FFFFFF88]"}`}
+          />
+        </>
         {showLove && (
           <div className="absolute left-1/2 top-1/2 z-[1] -translate-x-1/2 -translate-y-1/2">
             <HeartFilledIcon
