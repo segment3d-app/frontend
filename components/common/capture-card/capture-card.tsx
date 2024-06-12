@@ -153,13 +153,13 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
                     } else {
                       toast({
                         title: "Error",
-                        description: "3d poincloud have not yeat available",
+                        description: "point cloud have not yeat available",
                         variant: "destructive",
                       });
                     }
                   }}
                 >
-                  See 3D Poincloud
+                  See Point Cloud
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="cursor-pointer"
@@ -209,13 +209,13 @@ const CaptureCard: FC<CaptureCardProps> = ({ asset, removeAssetHandler }) => {
                     } else {
                       toast({
                         title: "Error",
-                        description: "3d poincloud have not yeat available",
+                        description: "point cloud have not yeat available",
                         variant: "destructive",
                       });
                     }
                   }}
                 >
-                  Download 3D Poincloud
+                  Download Point Cloud
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="cursor-pointer"

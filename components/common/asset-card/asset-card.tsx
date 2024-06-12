@@ -170,13 +170,13 @@ export default function AssetCard({ asset }: AssetCardProps) {
                   } else {
                     toast({
                       title: "Error",
-                      description: "3d poincloud have not yeat available",
+                      description: "point cloud have not yeat available",
                       variant: "destructive",
                     });
                   }
                 }}
               >
-                See 3D Poincloud
+                Point Cloud
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer"
@@ -226,13 +226,13 @@ export default function AssetCard({ asset }: AssetCardProps) {
                   } else {
                     toast({
                       title: "Error",
-                      description: "3d poincloud have not yeat available",
+                      description: "point cloud have not yeat available",
                       variant: "destructive",
                     });
                   }
                 }}
               >
-                Download 3D Poincloud
+                Download Point Cloud
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="cursor-pointer"
