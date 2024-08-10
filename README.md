@@ -1,4 +1,4 @@
-# Project Name
+# Segment3D Frontend
 
 This project is a part of the frontend service for the Segment3D App. It is built using [Next.js](https://nextjs.org/), a powerful React framework, and is bootstrapped with Node.js. For package management, the project utilizes [pnpm](https://pnpm.io/), which ensures fast and efficient installations while optimizing disk space usage.
 
